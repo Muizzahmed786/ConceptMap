@@ -22,6 +22,3 @@ DELETE  /api/connections/:id
 Graph:
 GET     /api/canvases/:id/graph
 ```
-{
-    "_id": "69ce6514c8677f3fc2e4eecc",
-}

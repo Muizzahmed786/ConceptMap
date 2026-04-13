@@ -3,7 +3,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 
-import router from './routes/canvas.routes.js';
+import canvasRouter from './routes/canvas.routes.js';
+import conceptRouter from './routes/concept.routes.js';
 
 dotenv.config();
 
@@ -15,11 +16,8 @@ app.use(cors());
 const startServer = async () => {
     await connectDB();
 
-    app.use('/api/canvases', router);
-
-    app.get('/', (req, res) => {
-        res.send('Backend Running');
-    });
+    app.use('/api/canvases', canvasRouter);
+    app.use('/api/concepts', conceptRouter);
 
     app.listen(process.env.PORT, () => console.log(`Server running on ${process.env.PORT}`));
 }
