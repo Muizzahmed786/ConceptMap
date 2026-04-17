@@ -8,6 +8,7 @@ const conceptSchema = mongoose.Schema({
     description: {
         type: String,
         required: false,
+        default : ""
     },
     tags: {
         type: [String],

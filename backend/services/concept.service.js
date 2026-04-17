@@ -21,3 +21,7 @@ export const conceptUpdate = async (conceptId, updateData) => {
     return concept;
 }
 
+export const conceptDelete = async (conceptId) => {
+    const concept = await Concept.findByIdAndDelete(conceptId);
+    return concept;
+}
