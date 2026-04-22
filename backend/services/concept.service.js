@@ -25,3 +25,8 @@ export const conceptDelete = async (conceptId) => {
     const concept = await Concept.findByIdAndDelete(conceptId);
     return concept;
 }
+
+export const getConceptsByIds = async (Ids) => {
+    const concepts = await Concept.find({_id: {$in: Ids}});
+    return concepts;
+}
