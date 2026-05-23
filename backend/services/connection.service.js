@@ -10,3 +10,18 @@ export const createConnection = async (connectionData) => {
         throw err;
     }
 }
+
+export const getConnectionById = async (connectionId) => {
+    const connection = await Connection.findById(connectionId);
+    return connection;
+}
+
+export const updateConnectionService = async (connectionId, updatedData) => {
+    const updatedConnection = await Connection.findByIdAndUpdate(connectionId, updatedData, {new: true, runValidators: true});
+    return updatedConnection;
+}
+
+export const deleteConnectionService = async (connectionId) => {
+    const connection = await Connection.findByIdAndDelete(connectionId);
+    return connection;
+}   
