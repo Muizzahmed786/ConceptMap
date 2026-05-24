@@ -1,4 +1,6 @@
 import { getAllCanvases, getCanvasById, createCanvas, updatedCanvas, deleteCanvas } from "../services/canvas.service.js";
+import {getConceptsByIds} from "../services/concept.service.js";
+import {getConnectionsByConceptId} from "../services/connection.service.js";
 
 // @desc    Fetch all canvases
 // @route   GET /api/canvases
@@ -97,5 +99,27 @@ export const deleteCanvasById = async (req, res) => {
             return res.status(400).json({message : `Invalid canvas id ${id}`});
         }
         return res.status(500).json({message : `Something went wrong, could not delete canvas with id ${id} : ${err}`});
+    }
+}
+
+//@desc    get the graph data for a canvas
+//@route   GET /api/canvases/:canvasId/graph
+//@access  Public
+export const getGraphDataForCanvas = async (req, res) => {
+    const {canvasId} = req.params;
+    try{
+        const canvas = await getCanvasById(canvasId);
+        if(!canvas){
+            return res.status(404).json({message : `Canvas with id ${canvasId} not found`});
+        }
+        const conceptIDs = canvas.concepts;
+        const concepts = await getConceptsByIds(conceptIDs);
+        const connections = await getConnectionsByConceptId(conceptIDs);
+        return res.status(200).json({concepts, connections});
+    } catch(err){
+        if(err.name === 'CastError'){
+            return res.status(400).json({message : `Invalid canvas ID format`});
+        }
+        return res.status(500).json({message : `Error fethching graph data for canvas ID ${canvasId} : ${err}`});
     }
 }

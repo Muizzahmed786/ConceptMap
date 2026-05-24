@@ -25,3 +25,8 @@ export const deleteConnectionService = async (connectionId) => {
     const connection = await Connection.findByIdAndDelete(connectionId);
     return connection;
 }   
+
+export const getConnectionsByConceptId = async (conceptIds) => {
+    const connections = await Connection.find({$and: [{source: {$in: conceptIds}}, {target: {$in: conceptIds}}]});
+    return connections;
+}
