@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* Global overrides */
+body {
+  background-color: #07111B;
+  color: #F8FAFC;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar for Drawer & Sidebar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* React Flow Overrides */
+.react-flow {
+  background-color: transparent !important;
+}
+
+/* Nodes styling */
+.react-flow__node-default {
+  background-color: #0F2030 !important;
+  border: 1px solid #14B8A6 !important;
+  color: #F8FAFC !important;
+  border-radius: 12px !important;
+  padding: 14px 20px !important;
+  font-weight: 500 !important;
+  font-size: 0.875rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  max-width: 180px !important;
+  word-wrap: break-word !important;
+}
+
+.react-flow__node-default:hover {
+  box-shadow: 0 0 16px rgba(20, 184, 166, 0.4) !important;
+  border-color: #22D3EE !important;
+}
+
+.react-flow__node-default.selected {
+  border: 2px solid #22D3EE !important;
+  box-shadow: 0 0 20px rgba(34, 211, 238, 0.35) !important;
+}
+
+/* Handles styling */
+.react-flow__handle {
+  background-color: #14B8A6 !important;
+  border: 1.5px solid #07111B !important;
+  width: 8px !important;
+  height: 8px !important;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.react-flow__handle:hover {
+  background-color: #22D3EE !important;
+  border-color: #14B8A6 !important;
+}
+
+/* Edges styling */
+.react-flow__edge-path {
+  stroke: #64748B !important;
+  stroke-width: 2px !important;
+  transition: stroke 0.2s, stroke-width 0.2s;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #14B8A6 !important;
+  stroke-width: 3px !important;
+}
+
+.react-flow__edge.animated .react-flow__edge-path {
+  stroke: #22D3EE !important;
+}
+
+/* Edge labels styling */
+.react-flow__edge-textbg {
+  fill: #0F2030 !important;
+  rx: 8px !important;
+  ry: 8px !important;
+}
+
+.react-flow__edge-text {
+  fill: #F8FAFC !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+}
+
+/* Minimap styling */
+.react-flow__minimap {
+  background-color: #07111B !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  overflow: hidden !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(255, 255, 255, 0.05) !important;
+}
+
+.react-flow__minimap-node {
+  fill: #14B8A6 !important;
+  opacity: 0.6;
+}
+
+/* Controls styling */
+.react-flow__controls {
+  background-color: #0F2030 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+
+.react-flow__controls-button {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  fill: #F8FAFC !important;
+  color: #F8FAFC !important;
+  width: 26px !important;
+  height: 26px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background-color 0.2s !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+.react-flow__controls-button:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+}
