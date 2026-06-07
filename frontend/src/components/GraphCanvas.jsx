@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import '@xyflow/react/dist/style.css';
 
 const GraphCanvas = (props) => {
-    const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect } = props;
+    const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect } = props;
 
     const nodes = useMemo(() => concepts.map((concept) => ({
         id: concept._id,
@@ -40,6 +40,7 @@ const GraphCanvas = (props) => {
                     edges={edges}
                     onNodeClick={onNodeClick}
                     onPaneClick={onPaneClick}
+                    onConnect={onConnect}
                 >
                     <Background color="rgba(255, 255, 255, 0.05)" gap={16} size={1} />
                     <Controls />

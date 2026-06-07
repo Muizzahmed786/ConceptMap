@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchCanvases, fetchGraphData, createConcept, updateConcept } from "../services/api.js";
+import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection } from "../services/api.js";
 
 import GraphCanvas from "../components/GraphCanvas.jsx";
 import ConceptDrawer from "../components/ConceptDrawer.jsx";
 import Sidebar from "../components/Sidebar.jsx";
+import ConnectionForm from "../components/ConnectionForm.jsx";
 
 const CanvasPage = () => {
     const [canvasList, setCanvasList] = useState([]);
@@ -12,8 +13,9 @@ const CanvasPage = () => {
     const [loading, setLoading] = useState(false);
     const [conceptFormVisible, setConceptFormVisible] = useState(false);
     const [toastVisible, setToastVisible] = useState(false);
-    const [selectedConcept, setSelectedConcept] = useState(null);
+    const [toastMessage, setToastMessage] = useState('');
     const [currentConcept, setCurrentConcept] = useState(null);
+    const [pendingConnection, setPendingConnection] = useState(null);
 
     const addConceptButtonRef = useRef(null);
 
@@ -66,6 +68,7 @@ const CanvasPage = () => {
             
             // Trigger toast alert
             setToastVisible(true);
+            setToastMessage('Concept created successfully');
             setTimeout(() => {
                 setToastVisible(false);
             }, 3000);
@@ -99,6 +102,7 @@ const CanvasPage = () => {
             
             // Trigger toast alert
             setToastVisible(true);
+            setToastMessage('Concept updated successfully');
             setTimeout(() => {
                 setToastVisible(false);
             }, 3000);
@@ -106,6 +110,47 @@ const CanvasPage = () => {
             console.error(e);
         }
     };
+
+    // handle deletion of a concept
+    const handleConceptDelete = async (conceptId) => {
+        try{
+            await deleteConcept(conceptId);
+            setGraphData((prev) => ({
+                ...prev,
+                concepts: prev.concepts.filter(concept => concept._id !== conceptId),
+                connections: prev.connections.filter(connection => connection.source !== conceptId && connection.target !== conceptId) 
+            }));
+            setCurrentConcept(null);
+        } catch(e){
+            console.error(e);
+        }
+    }
+
+    // handleConnect function to manage the creation of connections between concepts
+    const handleConnect = ({source, target}) => {
+        const pendingConnection = { source: source, target: target, relationType: null };
+        setPendingConnection(pendingConnection);
+    };
+    
+    // handle submission of the connection form
+    const handleConnectionSubmit = async (connectionData) => {
+        try{
+            const response = await createConnection(connectionData);
+            setGraphData((prev) => ({
+                ...prev,
+                connections: [...prev.connections, response.data]
+            })); 
+            setPendingConnection(null);
+        } catch(e){
+            console.error(e);
+        }
+    }
+
+    // handle cancellation of the connection form
+    const handleConnectionCancel = () => {
+        setPendingConnection(null);
+    }
+
 
     return (
         <div 
@@ -150,6 +195,7 @@ const CanvasPage = () => {
                         }}
                         addConceptButtonRef={addConceptButtonRef}
                         onConceptSelect={handleConceptSelect}
+                        onConnect={handleConnect}
                     />
                 </div>
 
@@ -165,9 +211,18 @@ const CanvasPage = () => {
                         currentConcept={currentConcept}
                         onSave={handleConceptUpdate}
                         onClose={() => setCurrentConcept(null)}
+                        onDelete={handleConceptDelete}
                     />
                 )}
             </div>
+
+            {pendingConnection && (
+                <ConnectionForm 
+                    pendingConnection={pendingConnection}
+                    onSubmit={handleConnectionSubmit}
+                    onCancel={handleConnectionCancel}
+                />
+            )}
 
             {/* Non-blocking Success Toast */}
             <div
@@ -180,7 +235,7 @@ const CanvasPage = () => {
                 <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-semibold text-sm">Concept created successfully</span>
+                <span className="font-semibold text-sm">{toastMessage}</span>
             </div>
         </div>
     );

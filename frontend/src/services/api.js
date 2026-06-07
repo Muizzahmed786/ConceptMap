@@ -26,4 +26,12 @@ export const updateConcept = async (conceptId, conceptData) => {
     return api.patch(`/api/concepts/${conceptId}`, conceptData);
 };
 
+export const deleteConcept = async (conceptId) => {
+    return api.delete(`/api/concepts/${conceptId}`);
+};
+
+export const createConnection = async (connectionData) => {
+    return api.post('/api/connections', connectionData);
+};
+
 export default api;
