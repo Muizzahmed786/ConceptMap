@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 const understandingLevels = ['Beginner', 'Intermediate', 'Advanced'];
 
 const Sidebar = (props) => {
-    const { currentConcept, onSave, onClose } = props;
+    const { currentConcept, onSave, onClose, onDelete } = props;
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -146,10 +146,14 @@ const Sidebar = (props) => {
                             <span>Save Changes</span>
                         )}
                     </button>
+
+                    <button onClick={() => onDelete(currentConcept._id)} className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-semibold py-2.5 rounded-xl shadow-[0_0_16px_rgba(239,68,68,0.2)] transition duration-200 flex items-center justify-center space-x-1.5 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer">
+                        delete
+                    </button>
                 </div>
             </form>
         </div>
     );
 };
 
-export default Sidebar;
+export default Sidebar;
