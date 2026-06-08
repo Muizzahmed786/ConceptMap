@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection } from "../services/api.js";
+import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection, createCanvas, deleteCanvas } from "../services/api.js";
 
 import GraphCanvas from "../components/GraphCanvas.jsx";
 import ConceptDrawer from "../components/ConceptDrawer.jsx";
@@ -17,8 +17,36 @@ const CanvasPage = () => {
     const [currentConcept, setCurrentConcept] = useState(null);
     const [pendingConnection, setPendingConnection] = useState(null);
     const [selectedConnection, setSelectedConnection] = useState(null);
+    const [isCreatingCanvas, setIsCreatingCanvas] = useState(false);
+    const [newCanvasTitle, setNewCanvasTitle] = useState('');
 
     const addConceptButtonRef = useRef(null);
+
+    // Handle creation of a canvas
+    const handleCreateCanvas = async (canvasTitle) => {
+        try{
+            setIsCreatingCanvas(true);
+            const response = await createCanvas(canvasTitle);
+            setCanvasList((prev) => [...prev, response.data]);
+            setCurrentCanvasId(response.data._id);
+            setNewCanvasTitle('');
+        } catch(e){
+            console.error(e);
+        } finally{
+            setIsCreatingCanvas(false);
+        }
+    }
+
+    const handleCanvasDelete = async (canvasId) => {
+        try{
+            await deleteCanvas(canvasId);
+            const remaining = canvasList.filter((canvas) => canvas._id !== canvasId);
+            setCanvasList(remaining);
+            setCurrentCanvasId(remaining[0]?._id || null);
+        } catch(e){
+            console.error(e);
+        }
+    }
 
     // Fetch all canvases when the component mounts
     useEffect(() => {
@@ -26,6 +54,7 @@ const CanvasPage = () => {
             try {
                 setLoading(true);
                 const response = await fetchCanvases();
+                console.log(response.data);
                 setCanvasList(response.data);
                 if (response.data && response.data.length > 0) {
                     setCurrentCanvasId(response.data[0]._id);
@@ -192,68 +221,133 @@ const CanvasPage = () => {
 
     return (
         <div 
-            className="flex h-screen w-full bg-[#07111B] text-[#F8FAFC] overflow-hidden"
-            style={{ backgroundImage: 'radial-gradient(circle at top left, rgba(20, 184, 166, 0.12), transparent 40%)' }}
+            className="flex h-screen w-full bg-obsidian text-plasteel overflow-hidden font-body relative"
         >
+            {/* Film Grain & Vignette overlays */}
+            <div className="dune-grain" />
+            <div className="dune-vignette" />
+
             {/* Sidebar */}
-            <div className="w-1/5 bg-[#0B1724]/40 border-r border-white/8 p-6 flex flex-col h-full overflow-y-auto">
-                <h2 className="text-xl font-bold mb-6 tracking-wide text-[#F8FAFC]">
-                    Canvases
+            <div className="w-1/5 bg-basalt/20 border-r border-sardaukar/10 p-6 flex flex-col h-full overflow-y-auto font-mono-fremen z-10">
+                <h2 className="text-xs font-semibold mb-6 tracking-[0.25em] text-plasteel uppercase font-display border-b border-sardaukar/10 pb-4">
+                    Imperial Maps
                 </h2>
                 {loading && canvasList.length === 0 ? (
-                    <p className="text-sm text-[#94A3B8] animate-pulse">Loading canvases...</p>
+                    <p className="text-xs text-sand animate-pulse font-mono-fremen uppercase tracking-widest">Loading telemetry...</p>
                 ) : (
-                    <div className="flex flex-col">
-                        {canvasList.map((canvas) => (
-                            <button
-                                key={canvas._id}
-                                className={`text-left p-3.5 mb-3 rounded-lg cursor-pointer transition duration-150 ease-in-out border-l-4 ${
-                                    currentCanvasId === canvas._id
-                                        ? "bg-[#0F2030] border-[#14B8A6] text-[#F8FAFC] font-semibold shadow-inner"
-                                        : "bg-[#0F2030]/20 border-transparent text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#0F2030]/60"
-                                }`}
-                                onClick={() => setCurrentCanvasId(canvas._id)}
-                            >
-                                {canvas.title}
-                            </button>
-                        ))}
-                    </div>
+                    <>
+                        <div className="flex flex-col flex-1">
+                            {canvasList.map((canvas) => (
+                                <div key={canvas._id} className="flex items-center group mb-3">
+                                    <button
+                                        className={`text-left p-3.5 mb-3 cursor-pointer transition-all duration-200 border-l-2 text-xs tracking-wider uppercase font-mono-fremen ${
+                                            currentCanvasId === canvas._id
+                                                ? "bg-basalt/50 border-spice-orange text-plasteel font-bold shadow-[inset_0_0_8px_rgba(255,107,0,0.1)]"
+                                                : "bg-transparent border-sardaukar/10 text-sand hover:text-plasteel hover:bg-basalt/25"
+                                        }`}
+                                        onClick={() => setCurrentCanvasId(canvas._id)}
+                                    >
+                                        {canvas.title}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleCanvasDelete(canvas._id)}
+                                        className="ml-2 text-sardaukar/40 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                    >
+                                        ❌
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        {/* Inline text input for new canvas title */}
+                        <div>
+                            {isCreatingCanvas ? (
+                                <div className="flex flex-col gap-2">
+                                    <input 
+                                        type="text" 
+                                        value={newCanvasTitle}
+                                        onChange={(e) => setNewCanvasTitle(e.target.value)}
+                                        placeholder="Map designation..."
+                                        className="w-full px-2 py-2 bg-transparent border-b border-spice-orange/50 text-plasteel placeholder-sardaukar/50 text-xs focus:outline-none font-mono-fremen"
+                                        autoFocus
+                                    />
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleCreateCanvas(newCanvasTitle)}
+                                            disabled={!newCanvasTitle.trim()}
+                                            className="flex-1 text-xs uppercase tracking-widest py-2 border border-spice-orange/60 text-plasteel hover:bg-spice-orange hover:text-obsidian transition-all font-mono-fremen disabled:opacity-40 cursor-pointer"
+                                        >
+                                            [ CONFIRM ]
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsCreatingCanvas(false);
+                                                setNewCanvasTitle('');
+                                            }}
+                                            className="flex-1 text-xs uppercase tracking-widest py-2 border border-sardaukar/20 text-sand hover:text-plasteel transition-all font-mono-fremen cursor-pointer"
+                                        >
+                                            [ CANCEL ]
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCreatingCanvas(true)}
+                                    className="w-full text-xs uppercase tracking-widest py-2.5 border border-sardaukar/20 text-sand hover:text-plasteel hover:border-spice-orange/40 transition-all font-mono-fremen cursor-pointer"
+                                >
+                                    [ + NEW MAP ]
+                                </button>
+                            )}
+                        </div>
+                    </>
                 )}
             </div>
 
             {/* Main Area containing Canvas & Drawer */}
-            <div className="flex-1 flex relative h-full overflow-hidden p-6 gap-6">
-                <div className="flex-1 h-full transition-all duration-300 ease-in-out">
-                    <GraphCanvas
-                        concepts={graphData.concepts}
-                        connections={graphData.connections}
-                        onAddConcept={() => {
-                            setCurrentConcept(null);
-                            setConceptFormVisible(true);
-                        }}
-                        addConceptButtonRef={addConceptButtonRef}
-                        onConceptSelect={handleConceptSelect}
-                        onConnect={handleConnect}
-                        onEdgeClick={handleConnectionSelect}
-                    />
-                </div>
+            {
+                canvasList.length > 0 ? (
+                    <div className="flex-1 flex relative h-full overflow-hidden p-6 gap-6 z-10">
+                        <div className="flex-1 min-w-0 h-full transition-all duration-300 ease-in-out">
+                            <GraphCanvas
+                                concepts={graphData.concepts}
+                                connections={graphData.connections}
+                                onAddConcept={() => {
+                                    setCurrentConcept(null);
+                                    setConceptFormVisible(true);
+                                }}
+                                addConceptButtonRef={addConceptButtonRef}
+                                onConceptSelect={handleConceptSelect}
+                                onConnect={handleConnect}
+                                onEdgeClick={handleConnectionSelect}
+                            />
+                        </div>
 
-                <ConceptDrawer
-                    isOpen={conceptFormVisible}
-                    onClose={() => setConceptFormVisible(false)}
-                    onSubmit={handleConceptSubmit}
-                    addConceptButtonRef={addConceptButtonRef}
-                />
+                        <ConceptDrawer
+                            isOpen={conceptFormVisible}
+                            onClose={() => setConceptFormVisible(false)}
+                            onSubmit={handleConceptSubmit}
+                            addConceptButtonRef={addConceptButtonRef}
+                        />
 
-                {currentConcept && (
-                    <Sidebar 
-                        currentConcept={currentConcept}
-                        onSave={handleConceptUpdate}
-                        onClose={() => setCurrentConcept(null)}
-                        onDelete={handleConceptDelete}
-                    />
-                )}
-            </div>
+                        {currentConcept && (
+                            <Sidebar 
+                                currentConcept={currentConcept}
+                                onSave={handleConceptUpdate}
+                                onClose={() => setCurrentConcept(null)}
+                                onDelete={handleConceptDelete}
+                            />
+                        )}
+                    </div>
+                ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-between">
+                        <p className="mt-82">No Canvases added yet</p>
+                    </div>
+                )
+            }
 
             {pendingConnection && (
                 <ConnectionForm 
@@ -280,14 +374,15 @@ const CanvasPage = () => {
             <div
                 role="status"
                 aria-live="polite"
-                className={`fixed bottom-6 right-6 z-50 bg-[#22C55E] text-white px-5 py-3.5 rounded-xl shadow-[0_4px_20px_rgba(34,197,94,0.3)] flex items-center space-x-2.5 transition-all duration-300 transform ${
+                className={`fixed bottom-6 right-6 z-50 bg-basalt/95 backdrop-blur-md text-plasteel border border-spice-orange rounded-none px-6 py-4 shadow-[0_0_30px_rgba(255,107,0,0.25)] flex items-center space-x-3 transition-all duration-500 transform font-mono-fremen ${
                     toastVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
                 }`}
+                style={{ filter: 'drop-shadow(0 0 8px rgba(255,107,0,0.2))' }}
             >
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                <svg className="w-4 h-4 shrink-0 text-spice-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="font-semibold text-sm">{toastMessage}</span>
+                <span className="font-semibold text-xs tracking-widest uppercase">{toastMessage}</span>
             </div>
         </div>
     );

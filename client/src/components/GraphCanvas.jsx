@@ -18,7 +18,7 @@ const GraphCanvas = (props) => {
         label: connection.relationType
     })), [connections]);
 
-    const btnClass = "bg-[#14B8A6] hover:bg-[#0D9488] text-white font-semibold py-2.5 px-5 rounded-xl shadow-[0_0_20px_rgba(20,184,166,0.25)] transition duration-200 flex items-center space-x-1.5 focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/50 cursor-pointer";
+    const btnClass = "bg-transparent hover:bg-spice-orange text-plasteel hover:text-obsidian font-mono-fremen text-xs tracking-widest uppercase py-3 px-6 border border-spice-orange/60 hover:border-spice-orange transition-all duration-300 flex items-center space-x-2 rounded-none cursor-pointer dune-shield-hover";
 
     const onNodeClick = (event, node) => {
         if (onConceptSelect) {
@@ -37,7 +37,7 @@ const GraphCanvas = (props) => {
     };
 
     return (
-        <div className="bg-[#0B1724] border border-white/8 h-full w-full rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden flex flex-col p-6">
+        <div className="bg-linear-to-br from-basalt/15 to-obsidian border border-sardaukar/15 h-full w-full rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative overflow-hidden flex flex-col p-6 z-10">
             {nodes.length > 0 ? (
                 <ReactFlow 
                     nodes={nodes} 
@@ -47,7 +47,7 @@ const GraphCanvas = (props) => {
                     onConnect={onConnect}
                     onEdgeClick={handleEdgeClick}
                 >
-                    <Background color="rgba(255, 255, 255, 0.05)" gap={16} size={1} />
+                    <Background color="rgba(139, 134, 128, 0.15)" gap={20} size={1} />
                     <Controls />
                     <Panel position='top-right'>
                         <button
@@ -55,14 +55,14 @@ const GraphCanvas = (props) => {
                             onClick={onAddConcept}
                             className={btnClass}
                         >
-                            <span>+ Add Concept</span>
+                            <span>+ ADD CONCEPT</span>
                         </button>
                     </Panel>
                 </ReactFlow>
             ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10">
-                    <p className="text-lg text-[#94A3B8] mb-6 font-medium">
-                        No concepts to display. Start by creating one!
+                <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10 font-mono-fremen">
+                    <p className="text-sm text-sand mb-6 tracking-wider uppercase">
+                        No telemetry detected. Initialize scouting array.
                     </p>
 
                     <button
@@ -70,7 +70,7 @@ const GraphCanvas = (props) => {
                         onClick={onAddConcept}
                         className={btnClass}
                     >
-                        <span>+ Add Concept</span>
+                        <span>+ ADD CONCEPT</span>
                     </button>
                 </div>
             )}
