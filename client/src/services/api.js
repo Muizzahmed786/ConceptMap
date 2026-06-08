@@ -14,6 +14,14 @@ export const fetchCanvases = async () => {
     return api.get('/api/canvases');
 };
 
+export const createCanvas = async (canvasTitle) => {
+    return api.post(`/api/canvases/`, {title: canvasTitle});
+}
+
+export const deleteCanvas = async(canvasId) => {
+    return api.delete(`/api/canvases/${canvasId}`);
+}
+
 export const fetchGraphData = async (canvasId) => {
     return api.get(`/api/canvases/${canvasId}/graph`);
 };

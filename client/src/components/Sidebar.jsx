@@ -11,6 +11,7 @@ const Sidebar = (props) => {
         understandingLevel: 'Beginner'
     });
     const [isSaving, setIsSaving] = useState(false);
+    const [newNote, setNewNote] = useState('');
 
     // Sync input states when the selected concept changes
     useEffect(() => {
@@ -46,28 +47,41 @@ const Sidebar = (props) => {
         }
     };
 
+    // Handle adding a new note to the concept
+    const handleAddNote = () => {
+        const updatedNotes = [...(currentConcept.notes || []), {content: newNote.trim()}];
+        onSave(currentConcept._id, {...formData, notes: updatedNotes});
+        setNewNote('');
+    };
+
+    // Handle deleting a note from the concept
+    const handleDeleteNote = (noteId) => {
+        const updatedNotes = currentConcept.notes.filter((note) => note._id !== noteId);
+        onSave(currentConcept._id, {...formData, notes: updatedNotes});
+    };
+
     if (!currentConcept) return null;
 
     return (
-        <div className="w-80 bg-[#0F2030] border-l border-white/8 h-full rounded-tl-3xl rounded-bl-3xl shadow-[0_8px_32px_rgba(0,0,0,0.35)] p-6 flex flex-col relative z-20">
+        <div className="w-85 shrink-0 bg-linear-to-br from-basalt to-obsidian/95 border-l border-sardaukar/20 h-full rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.75)] p-6 flex flex-col relative z-20 backdrop-blur-md">
             {/* Close Button */}
             <button
                 onClick={onClose}
                 aria-label="Close details"
-                className="absolute top-6 right-6 text-[#94A3B8] hover:text-[#F8FAFC] p-1.5 rounded-lg hover:bg-white/5 transition-colors focus:outline-none"
+                className="absolute top-6 right-6 text-sand hover:text-plasteel p-1.5 border border-transparent hover:border-sardaukar/25 hover:bg-basalt/30 transition-all focus:outline-none rounded-none cursor-pointer"
             >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
-            <h2 className="text-xl font-semibold text-[#F8FAFC] mb-6">Concept Details</h2>
+            <h2 className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.25em] border-b border-sardaukar/10 pb-4 mb-6">Concept Details</h2>
 
             <form onSubmit={handleSave} className="space-y-5 flex-1 flex flex-col justify-between overflow-y-auto">
-                <div className="space-y-4">
+                <div className="space-y-5">
                     <div>
-                        <label htmlFor="edit-title" className="block text-xs font-medium text-[#94A3B8] mb-1.5">
-                            Title
+                        <label htmlFor="edit-title" className="block text-[10px] tracking-[0.25em] uppercase font-mono-fremen text-sand mb-2">
+                            [01] Title
                         </label>
                         <input
                             id="edit-title"
@@ -76,13 +90,13 @@ const Sidebar = (props) => {
                             value={formData.title}
                             onChange={handleChange}
                             required
-                            className="w-full px-3 py-2 bg-white/4 border border-white/8 rounded-lg text-[#F8FAFC] placeholder-[#94A3B8] text-sm focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition"
+                            className="w-full px-1 py-2 bg-transparent border-b border-sardaukar/30 text-plasteel placeholder-sardaukar/50 text-sm focus:outline-none focus:border-spice-orange transition-colors font-mono-fremen"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="edit-description" className="block text-xs font-medium text-[#94A3B8] mb-1.5">
-                            Description
+                        <label htmlFor="edit-description" className="block text-[10px] tracking-[0.25em] uppercase font-mono-fremen text-sand mb-2">
+                            [02] Description
                         </label>
                         <textarea
                             id="edit-description"
@@ -90,13 +104,13 @@ const Sidebar = (props) => {
                             value={formData.description}
                             onChange={handleChange}
                             rows={4}
-                            className="w-full px-3 py-2 bg-white/4 border border-white/8 rounded-lg text-[#F8FAFC] placeholder-[#94A3B8] text-sm resize-none focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition"
+                            className="w-full px-1 py-2 bg-transparent border-b border-sardaukar/30 text-plasteel placeholder-sardaukar/50 text-sm resize-none focus:outline-none focus:border-spice-orange transition-colors font-mono-fremen"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="edit-tags" className="block text-xs font-medium text-[#94A3B8] mb-1.5">
-                            Tags (comma separated)
+                        <label htmlFor="edit-tags" className="block text-[10px] tracking-[0.25em] uppercase font-mono-fremen text-sand mb-2">
+                            [03] Tags (comma-separated)
                         </label>
                         <input
                             id="edit-tags"
@@ -104,51 +118,86 @@ const Sidebar = (props) => {
                             name="tags"
                             value={formData.tags.join(', ')}
                             onChange={handleChange}
-                            className="w-full px-3 py-2 bg-white/4 border border-white/8 rounded-lg text-[#F8FAFC] placeholder-[#94A3B8] text-sm focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition"
+                            className="w-full px-1 py-2 bg-transparent border-b border-sardaukar/30 text-plasteel placeholder-sardaukar/50 text-sm focus:outline-none focus:border-spice-orange transition-colors font-mono-fremen"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="edit-understandingLevel" className="block text-xs font-medium text-[#94A3B8] mb-1.5">
-                            Understanding Level
+                        <label htmlFor="edit-understandingLevel" className="block text-[10px] tracking-[0.25em] uppercase font-mono-fremen text-sand mb-2">
+                            [04] Cognitive Depth
                         </label>
                         <select
                             id="edit-understandingLevel"
                             name="understandingLevel"
                             value={formData.understandingLevel}
                             onChange={handleChange}
-                            className="w-full px-3 py-2 bg-white/4 border border-white/8 rounded-lg text-[#F8FAFC] text-sm focus:outline-none focus:border-[#14B8A6] focus:ring-2 focus:ring-[#14B8A6]/20 transition cursor-pointer"
+                            className="w-full px-1 py-2 bg-transparent border-b border-sardaukar/30 text-plasteel text-sm focus:outline-none focus:border-spice-orange transition-colors cursor-pointer font-mono-fremen"
                         >
                             {understandingLevels.map((level) => (
-                                <option key={level} value={level} className="bg-[#0F2030] text-[#F8FAFC]">
+                                <option key={level} value={level} className="bg-obsidian text-plasteel">
                                     {level}
                                 </option>
                             ))}
                         </select>
                     </div>
+
+                    <div>
+                        <label htmlFor="edit-notes" className="block text-[10px] tracking-[0.25em] uppercase font-mono-fremen text-sand mb-2">
+                            [05] Field Notes
+                        </label>
+                        <div>
+                            {currentConcept.notes && currentConcept.notes.length > 0 ? (
+                                <ul className="space-y-3 max-h-40 overflow-y-auto pr-2">
+                                    {currentConcept.notes.map((note) => (
+                                        
+                                        <li key={note._id} className="bg-basalt/30 border border-transparent hover:border-sardaukar/30 p-3 rounded-non relative group">
+                                            {note.content}
+                                            <button  type='button' onClick={() => handleDeleteNote(note._id)}>
+                                                ❌
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <p>No notes to display as of now</p>
+                            )}
+                        </div>
+
+                        <div>
+                            <input 
+                                id="edit-notes"
+                                type="text"
+                                name="notes"
+                                value={newNote}
+                                onChange={(e) => setNewNote(e.target.value)}
+                                className="w-full px-1 py-2 bg-transparent border-b border-sardaukar/30 text-plasteel placeholder-sardaukar/50 text-sm focus:outline-none focus:border-spice-orange transition-colors font-mono-fremen"
+                            />
+                            <button type='button' onClick={handleAddNote}>
+                                ADD NOTE
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-6 border-t border-sardaukar/10 mt-auto">
                     <button
                         type="submit"
                         disabled={isSaving || !formData.title.trim()}
-                        className="w-full bg-[#14B8A6] hover:bg-[#0D9488] text-white text-sm font-semibold py-2.5 rounded-xl shadow-[0_0_16px_rgba(20,184,166,0.2)] transition duration-200 flex items-center justify-center space-x-1.5 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+                        className="w-full bg-transparent hover:bg-spice-orange text-plasteel hover:text-obsidian text-xs tracking-[0.2em] font-bold font-display uppercase py-3 border border-spice-orange/60 hover:border-spice-orange transition-all duration-300 flex items-center justify-center space-x-2 rounded-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed dune-shield-hover"
                     >
                         {isSaving ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                <span>Saving...</span>
-                            </>
+                            <span className="animate-pulse">[ SAVING CHANGES... ]</span>
                         ) : (
-                            <span>Save Changes</span>
+                            <span>[ SAVE CHANGES ]</span>
                         )}
                     </button>
 
-                    <button onClick={() => onDelete(currentConcept._id)} className="w-full bg-[#EF4444] hover:bg-[#DC2626] text-white text-sm font-semibold py-2.5 rounded-xl shadow-[0_0_16px_rgba(239,68,68,0.2)] transition duration-200 flex items-center justify-center space-x-1.5 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer">
-                        delete
+                    <button 
+                        type="button"
+                        onClick={() => onDelete(currentConcept._id)} 
+                        className="w-full bg-transparent hover:bg-red-950/40 text-red-400 hover:text-red-300 text-xs tracking-[0.2em] font-bold font-display uppercase py-3 mt-3 border border-red-900/40 hover:border-red-600 transition-all duration-300 flex items-center justify-center space-x-2 rounded-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <span>[ PURGE NODE ]</span>
                     </button>
                 </div>
             </form>

@@ -63,7 +63,7 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
         <>
             {/* Docking spacer for desktop and tablet layouts to shrink canvas width smoothly */}
             <div 
-                className={`hidden md:block transition-[width] duration-250 ease-in-out shrink-0 ${
+                className={`hidden md:block transition-[width] duration-300 ease-in-out shrink-0 ${
                     isOpen ? "lg:w-100 md:w-85" : "w-0"
                 }`}
             />
@@ -74,19 +74,19 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="drawer-title"
-                className={`absolute top-0 right-0 h-full z-50 bg-[#0F2030]/95 backdrop-blur-lg border-l border-white/8 shadow-2xl transition-transform duration-250 ease-in-out flex flex-col
+                className={`absolute top-0 right-0 h-full z-50 bg-gradient-to-b from-basalt to-obsidian/98 border-l border-sardaukar/20 shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out flex flex-col
                     ${isOpen ? "translate-x-0" : "translate-x-full"}
                     w-full md:w-85 lg:w-100`}
             >
                 {/* Sticky Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-white/8 bg-[#0F2030]/50 backdrop-blur-md">
-                    <h2 id="drawer-title" className="text-xl font-semibold text-[#F8FAFC]">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-sardaukar/10 bg-basalt/30 backdrop-blur-md">
+                    <h2 id="drawer-title" className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.25em]">
                         Create Concept
                     </h2>
                     <button
                         onClick={onClose}
                         aria-label="Close drawer"
-                        className="text-[#94A3B8] hover:text-[#F8FAFC] p-2 rounded-lg hover:bg-white/5 transition-colors focus:outline-none focus:ring-2 focus:ring-[#14B8A6]/50"
+                        className="text-sand hover:text-plasteel p-2 rounded-none hover:bg-basalt/30 transition-all border border-transparent hover:border-sardaukar/20 focus:outline-none cursor-pointer"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
