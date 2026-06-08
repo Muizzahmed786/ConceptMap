@@ -34,4 +34,12 @@ export const createConnection = async (connectionData) => {
     return api.post('/api/connections', connectionData);
 };
 
+export const updateConnection = async(connectionId, connectionData) => {
+    return api.patch(`/api/connections/${connectionId}`, connectionData);
+};
+
+export const deleteConnection = async (connectionId) => {
+    return api.delete(`/api/connections/${connectionId}`);
+};
+
 export default api;

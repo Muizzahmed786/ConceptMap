@@ -1,9 +1,9 @@
 import { ReactFlow, Panel, Controls, Background } from '@xyflow/react';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import '@xyflow/react/dist/style.css';
 
 const GraphCanvas = (props) => {
-    const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect } = props;
+    const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect, onEdgeClick } = props;
 
     const nodes = useMemo(() => concepts.map((concept) => ({
         id: concept._id,
@@ -32,6 +32,10 @@ const GraphCanvas = (props) => {
         }
     };
 
+    const handleEdgeClick = (event, edge) => {
+        return onEdgeClick ? onEdgeClick(edge) : null;
+    };
+
     return (
         <div className="bg-[#0B1724] border border-white/8 h-full w-full rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.35)] relative overflow-hidden flex flex-col p-6">
             {nodes.length > 0 ? (
@@ -41,6 +45,7 @@ const GraphCanvas = (props) => {
                     onNodeClick={onNodeClick}
                     onPaneClick={onPaneClick}
                     onConnect={onConnect}
+                    onEdgeClick={handleEdgeClick}
                 >
                     <Background color="rgba(255, 255, 255, 0.05)" gap={16} size={1} />
                     <Controls />

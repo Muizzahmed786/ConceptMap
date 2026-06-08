@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ConnectionForm = (props) => {
-    const { pendingConnection, onSubmit, onCancel } = props;
+    const { pendingConnection, onSubmit, onCancel, onDelete, mode } = props;
     const [relationType, setRelationType] = useState('');
 
     const handleSubmit = () => {
@@ -10,10 +10,11 @@ const ConnectionForm = (props) => {
             return;
         }
 
-        onSubmit({
-            ...pendingConnection,
-            relationType: relationType.trim()
-        });
+        if(mode === 'edit'){
+            onSubmit(pendingConnection.id, {relationType: relationType.trim()});
+        } else{
+            onSubmit({...pendingConnection, relationType: relationType.trim()});
+        }
 
         setRelationType('');
     }
@@ -21,6 +22,22 @@ const ConnectionForm = (props) => {
     const handleCancel = () => {
         setRelationType('');
         onCancel();
+    }
+
+    useEffect(() => {
+        if (mode === 'edit' && pendingConnection?.label) {
+            setRelationType(pendingConnection.label);
+        } else {
+            setRelationType('');
+        }
+    }, [pendingConnection, mode]);
+
+    const handleDelete = () => {
+        if(window.confirm('Are you sure you want to delete this connection ? This action cannot be undone')){
+            onDelete(pendingConnection.id);
+        } else{
+            return;
+        }
     }
 
     return (
@@ -62,6 +79,16 @@ const ConnectionForm = (props) => {
                         >
                             Submit
                         </button>
+                        {mode === 'edit' && (
+                            <>
+                                <button 
+                                    type='button'
+                                    onClick={handleDelete}
+                                    className='w-full sm:auto bg-red-600 hover:bg-transparent text-white hover:text-red-400 font-medium py-2.5 px-5 rounded-lg border border-transparent hover:border-red-500 text-sm shadow-sm transition-all duration-300 hover:shadow-[0_0_20px_rgba(239, 68, 68, 0.6)]'>
+                                    Delete
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>

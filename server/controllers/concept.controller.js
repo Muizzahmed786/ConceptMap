@@ -46,13 +46,14 @@ export const getConcept = async (req, res) => {
 //@access Public
 export const updateConcept = async (req, res) => {
     const {conceptId} = req.params;
-    const {title, description, tags, understandingLevel} = req.body;
+    const {title, description, tags, understandingLevel, notes} = req.body;
     try{
         const updatedData = {};
         if(title !== undefined) updatedData.title = title;
         if(description !== undefined) updatedData.description = description;
         if(tags !== undefined) updatedData.tags = tags;
         if(understandingLevel !== undefined) updatedData.understandingLevel = understandingLevel;
+        if(notes !== undefined) updatedData.notes = notes;
 
         const updatedConcept = await conceptUpdate(conceptId, updatedData);
         if(!updatedConcept){

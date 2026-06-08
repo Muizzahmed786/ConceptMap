@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection } from "../services/api.js";
+import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection } from "../services/api.js";
 
 import GraphCanvas from "../components/GraphCanvas.jsx";
 import ConceptDrawer from "../components/ConceptDrawer.jsx";
@@ -16,6 +16,7 @@ const CanvasPage = () => {
     const [toastMessage, setToastMessage] = useState('');
     const [currentConcept, setCurrentConcept] = useState(null);
     const [pendingConnection, setPendingConnection] = useState(null);
+    const [selectedConnection, setSelectedConnection] = useState(null);
 
     const addConceptButtonRef = useRef(null);
 
@@ -151,6 +152,43 @@ const CanvasPage = () => {
         setPendingConnection(null);
     }
 
+    // handle cancellation of the connection details view/edit
+    const handleConnectionEditCancel = () => {
+        setSelectedConnection(null);
+    }
+
+    // handle selection of a connection to view/edit it's details
+    const handleConnectionSelect = (edge) => {
+        setSelectedConnection(edge || null);
+    }
+
+    // handle updating a connection's details
+    const handleConnectionUpdate = async (connectionId, updatedData) => {
+        try{
+            const response = await updateConnection(connectionId, updatedData);
+            setGraphData((prev) => ({
+                ...prev,
+                connections: prev.connections.map(connection => connection._id === connectionId ? response.data : connection)
+            }));
+            setSelectedConnection(null);
+        } catch(e){
+            console.error(e);
+        }
+    }
+
+    // handle deletion of a connection
+    const handleConnectionDelete = async (connectionId) => {
+        try{
+            await deleteConnection(connectionId);
+            setGraphData((prev) => ({
+                ...prev,
+                connections: prev.connections.filter(connection => connection._id !== connectionId)
+            }));
+            setSelectedConnection(null);
+        } catch(e){
+            console.error(e);
+        }
+    }
 
     return (
         <div 
@@ -196,6 +234,7 @@ const CanvasPage = () => {
                         addConceptButtonRef={addConceptButtonRef}
                         onConceptSelect={handleConceptSelect}
                         onConnect={handleConnect}
+                        onEdgeClick={handleConnectionSelect}
                     />
                 </div>
 
@@ -221,8 +260,21 @@ const CanvasPage = () => {
                     pendingConnection={pendingConnection}
                     onSubmit={handleConnectionSubmit}
                     onCancel={handleConnectionCancel}
+                    onDelete={handleConnectionDelete}
+                    mode={'create'}
                 />
             )}
+
+            {selectedConnection && (
+                <ConnectionForm 
+                    pendingConnection={selectedConnection}
+                    onSubmit={handleConnectionUpdate}
+                    onCancel={handleConnectionEditCancel}
+                    onDelete={handleConnectionDelete}
+                    mode={'edit'}
+                />
+            )}
+
 
             {/* Non-blocking Success Toast */}
             <div

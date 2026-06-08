@@ -1,5 +1,9 @@
 import mongoose from "mongoose";
 
+const noteSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+}, { timestamps: true });
+
 const conceptSchema = mongoose.Schema({
     title: {
         type: String,
@@ -21,6 +25,10 @@ const conceptSchema = mongoose.Schema({
         default: 'Beginner',
         required: true,
     },
+    notes: {
+        type: [noteSchema],
+        default: [],
+    }
 }, {
     timestamps: true,
 });
