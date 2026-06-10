@@ -1,5 +1,5 @@
-import { ReactFlow, Panel, Controls, Background } from '@xyflow/react';
-import { useMemo } from 'react';
+import { ReactFlow, Panel, Controls, Background, useNodesState, useEdgesState } from '@xyflow/react';
+import { useEffect, useMemo } from 'react';
 import '@xyflow/react/dist/style.css';
 
 // Pure deterministic coordinate generator to avoid ESLint purity issues
@@ -18,6 +18,9 @@ const getDeterministicPosition = (id) => {
 const GraphCanvas = (props) => {
     const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect, onEdgeClick } = props;
 
+    const [nodes, setNodes, onNodesChange] = useNodesState([]);
+    const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+
     const {beginnerCount, interCount, advanceCount} = useMemo(() => {
         let beginnerCount = 0, interCount = 0, advanceCount = 0;
         for(let i=0;i<concepts.length;i++){
@@ -28,19 +31,36 @@ const GraphCanvas = (props) => {
         return {beginnerCount, interCount, advanceCount};
     }, [concepts]);
 
-    const nodes = useMemo(() => concepts.map((concept) => ({
-        id: concept._id,
-        position: getDeterministicPosition(concept._id),
-        data: { label: concept.title, understanding: concept.understandingLevel },
-        className: concept.understandingLevel === 'Beginner' ? 'beginner-node' : ''
-    })), [concepts]);
+    useEffect(() => {
+        const mapNodes = () => {
+            setNodes((prevNodes => concepts.map(concept => {
+                const existing = prevNodes.find(n => n.id === concept._id);
+                let levelClass = '';
+                if (concept.understandingLevel === 'Beginner') levelClass = 'beginner-node';
+                else if (concept.understandingLevel === 'Intermediate') levelClass = 'intermediate-node';
+                else if (concept.understandingLevel === 'Advanced') levelClass = 'advanced-node';
+                return{
+                    id: concept._id,
+                    position: existing ? existing.position : getDeterministicPosition(concept._id),
+                    data: { label: concept.title, understanding: concept.understandingLevel },
+                    className: levelClass,
+                }
+            })));
+        }
+        mapNodes();
+    }, [concepts]);
 
-    const edges = useMemo(() => connections.map((connection) => ({
-        id: connection._id,
-        source: connection.source,
-        target: connection.target,
-        label: connection.relationType
-    })), [connections]);
+    useEffect(() => {
+        const mapEdges = () => {
+            setEdges(connections.map(connection => ({
+                id: connection._id,
+                source: connection.source,
+                target: connection.target,
+                label: connection.relationType,
+            })));
+        }
+        mapEdges();
+    }, [connections]);
 
     const btnClass = "bg-transparent hover:bg-spice-orange text-plasteel hover:text-obsidian font-mono-fremen text-xs tracking-widest uppercase py-3 px-6 border border-spice-orange/60 hover:border-spice-orange transition-all duration-300 flex items-center space-x-2 rounded-none cursor-pointer dune-shield-hover";
 
@@ -70,6 +90,8 @@ const GraphCanvas = (props) => {
                     onPaneClick={onPaneClick}
                     onConnect={onConnect}
                     onEdgeClick={handleEdgeClick}
+                    onNodesChange={onNodesChange}
+                    onEdgesChange={onEdgesChange}
                 >
                     <Background color="rgba(139, 134, 128, 0.15)" gap={20} size={1} />
                     <Controls />
@@ -87,7 +109,7 @@ const GraphCanvas = (props) => {
                             <span className="text-plasteel/50 tracking-[0.2em] mb-1">[ Knowledge Map ]</span>
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
-                                <span className="text-sand">Beginner</span>
+                                <span className="text-sand">Weak</span>
                                 <span className="ml-auto text-plasteel font-bold">{beginnerCount}</span>
                             </div>
                             <div className="flex items-center gap-2">
