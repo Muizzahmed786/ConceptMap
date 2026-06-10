@@ -18,6 +18,7 @@ const CanvasPage = () => {
     const [pendingConnection, setPendingConnection] = useState(null);
     const [selectedConnection, setSelectedConnection] = useState(null);
     const [isCreatingCanvas, setIsCreatingCanvas] = useState(false);
+    const [isSubmittingCanvas, setIsSubmittingCanvas] = useState(false);
     const [newCanvasTitle, setNewCanvasTitle] = useState('');
 
     const addConceptButtonRef = useRef(null);
@@ -25,15 +26,16 @@ const CanvasPage = () => {
     // Handle creation of a canvas
     const handleCreateCanvas = async (canvasTitle) => {
         try{
-            setIsCreatingCanvas(true);
+            setIsSubmittingCanvas(true);
             const response = await createCanvas(canvasTitle);
             setCanvasList((prev) => [...prev, response.data]);
             setCurrentCanvasId(response.data._id);
             setNewCanvasTitle('');
+            setIsCreatingCanvas(false);
         } catch(e){
             console.error(e);
         } finally{
-            setIsCreatingCanvas(false);
+            setIsSubmittingCanvas(false);
         }
     }
 
@@ -54,7 +56,6 @@ const CanvasPage = () => {
             try {
                 setLoading(true);
                 const response = await fetchCanvases();
-                console.log(response.data);
                 setCanvasList(response.data);
                 if (response.data && response.data.length > 0) {
                     setCurrentCanvasId(response.data[0]._id);
@@ -229,22 +230,25 @@ const CanvasPage = () => {
 
             {/* Sidebar */}
             <div className="w-1/5 bg-basalt/20 border-r border-sardaukar/10 p-6 flex flex-col h-full overflow-y-auto font-mono-fremen z-10">
-                <h2 className="text-xs font-semibold mb-6 tracking-[0.25em] text-plasteel uppercase font-display border-b border-sardaukar/10 pb-4">
+                <h2 className="text-xs font-semibold mb-6 tracking-[0.12em] text-plasteel uppercase font-display border-b border-sardaukar/25 pb-4">
                     Imperial Maps
                 </h2>
                 {loading && canvasList.length === 0 ? (
                     <p className="text-xs text-sand animate-pulse font-mono-fremen uppercase tracking-widest">Loading telemetry...</p>
                 ) : (
                     <>
-                        <div className="flex flex-col flex-1">
+                        <div className="flex flex-col mb-4">
                             {canvasList.map((canvas) => (
-                                <div key={canvas._id} className="flex items-center group mb-3">
+                                <div 
+                                    key={canvas._id} 
+                                    className={`flex items-center justify-between group mb-3 transition-all duration-200 border-l-2 w-full ${
+                                        currentCanvasId === canvas._id
+                                            ? "bg-basalt/50 border-spice-orange text-plasteel font-bold shadow-[inset_0_0_8px_rgba(255,107,0,0.1)]"
+                                            : "bg-transparent border-sardaukar/10 text-sand hover:text-plasteel hover:bg-basalt/25"
+                                    }`}
+                                >
                                     <button
-                                        className={`text-left p-3.5 mb-3 cursor-pointer transition-all duration-200 border-l-2 text-xs tracking-wider uppercase font-mono-fremen ${
-                                            currentCanvasId === canvas._id
-                                                ? "bg-basalt/50 border-spice-orange text-plasteel font-bold shadow-[inset_0_0_8px_rgba(255,107,0,0.1)]"
-                                                : "bg-transparent border-sardaukar/10 text-sand hover:text-plasteel hover:bg-basalt/25"
-                                        }`}
+                                        className="flex-1 text-left p-3.5 cursor-pointer text-xs tracking-wider uppercase font-mono-fremen focus:outline-none"
                                         onClick={() => setCurrentCanvasId(canvas._id)}
                                     >
                                         {canvas.title}
@@ -252,9 +256,10 @@ const CanvasPage = () => {
                                     <button
                                         type="button"
                                         onClick={() => handleCanvasDelete(canvas._id)}
-                                        className="ml-2 text-sardaukar/40 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                        className="pr-3.5 text-sardaukar/40 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all cursor-pointer focus:outline-none"
+                                        title="Delete map"
                                     >
-                                        ❌
+                                        [ X ]
                                     </button>
                                 </div>
                             ))}
@@ -276,10 +281,10 @@ const CanvasPage = () => {
                                         <button
                                             type="button"
                                             onClick={() => handleCreateCanvas(newCanvasTitle)}
-                                            disabled={!newCanvasTitle.trim()}
+                                            disabled={!newCanvasTitle.trim() || isSubmittingCanvas}
                                             className="flex-1 text-xs uppercase tracking-widest py-2 border border-spice-orange/60 text-plasteel hover:bg-spice-orange hover:text-obsidian transition-all font-mono-fremen disabled:opacity-40 cursor-pointer"
                                         >
-                                            [ CONFIRM ]
+                                            {isSubmittingCanvas ? '[ TRANSMITTING...]' : '[ CONFIRM ]'}
                                         </button>
                                         <button
                                             type="button"
@@ -335,6 +340,7 @@ const CanvasPage = () => {
 
                         {currentConcept && (
                             <Sidebar 
+                                key={currentConcept._id}
                                 currentConcept={currentConcept}
                                 onSave={handleConceptUpdate}
                                 onClose={() => setCurrentConcept(null)}
@@ -343,14 +349,25 @@ const CanvasPage = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-between">
-                        <p className="mt-82">No Canvases added yet</p>
+                    <div className="flex-1 flex flex-col items-center justify-center h-full p-6 text-center font-mono-fremen z-10">
+                        <div className="max-w-md border border-sardaukar/20 bg-basalt/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                            <h3 className="text-xs font-semibold text-spice-orange tracking-[0.12em] uppercase font-display mb-4">
+                                NO ACTIVE TELEMETRY
+                            </h3>
+                            <p className="text-xs text-sand uppercase tracking-widest leading-relaxed mb-6">
+                                Choose a coordinate map system from the Imperial Maps panel or create a new map designation below.
+                            </p>
+                            <div className="text-[10px] text-sardaukar uppercase tracking-[0.2em] animate-pulse">
+                                [ Scouting array offline ]
+                            </div>
+                        </div>
                     </div>
                 )
             }
 
             {pendingConnection && (
                 <ConnectionForm 
+                    key={`create-${pendingConnection.source}-${pendingConnection.target}`}
                     pendingConnection={pendingConnection}
                     onSubmit={handleConnectionSubmit}
                     onCancel={handleConnectionCancel}
@@ -361,6 +378,7 @@ const CanvasPage = () => {
 
             {selectedConnection && (
                 <ConnectionForm 
+                    key={`edit-${selectedConnection.id}`}
                     pendingConnection={selectedConnection}
                     onSubmit={handleConnectionUpdate}
                     onCancel={handleConnectionEditCancel}

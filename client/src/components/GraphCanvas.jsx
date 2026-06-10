@@ -1,14 +1,33 @@
 import { ReactFlow, Panel, Controls, Background } from '@xyflow/react';
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import '@xyflow/react/dist/style.css';
+
+// Pure deterministic coordinate generator to avoid ESLint purity issues
+// and ensure node layout is stable across re-renders
+const getDeterministicPosition = (id) => {
+    let hash = 0;
+    const str = id || '';
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const x = Math.abs(hash % 500) + 50;
+    const y = Math.abs((hash >> 8) % 400) + 50;
+    return { x, y };
+};
 
 const GraphCanvas = (props) => {
     const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect, onEdgeClick } = props;
 
     const nodes = useMemo(() => concepts.map((concept) => ({
         id: concept._id,
-        position: { x: Math.random() * 500, y: Math.random() * 500 },
-        data: { label: concept.title }
+        position: getDeterministicPosition(concept._id),
+        data: { label: concept.title, understanding: concept.understandingLevel },
+        style: concept.understandingLevel === 'Beginner' ? {
+            border: '1px solid rgba(239, 68, 68, 0.8)',
+            boxShadow: '0 0 10px 3px rgba(239, 68, 68, 0.6)',
+            animation: 'glow-pulse 2s ease-in-out infinite',
+            overflow: 'visible',
+        } : {}
     })), [concepts]);
 
     const edges = useMemo(() => connections.map((connection) => ({
@@ -55,7 +74,7 @@ const GraphCanvas = (props) => {
                             onClick={onAddConcept}
                             className={btnClass}
                         >
-                            <span>+ ADD CONCEPT</span>
+                            <span>[ ADD CONCEPT ]</span>
                         </button>
                     </Panel>
                 </ReactFlow>
@@ -69,8 +88,9 @@ const GraphCanvas = (props) => {
                         ref={addConceptButtonRef}
                         onClick={onAddConcept}
                         className={btnClass}
+                        aria-label="Add concept"
                     >
-                        <span>+ ADD CONCEPT</span>
+                        <span>[ ADD CONCEPT ]</span>
                     </button>
                 </div>
             )}
