@@ -7,6 +7,8 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
     useEffect(() => {
         if (!isOpen) return;
 
+        const triggerButton = addConceptButtonRef?.current;
+
         // Focus the first focusable input inside the drawer
         const focusFirstInput = () => {
             const firstInput = drawerRef.current?.querySelector('input, textarea, select, button');
@@ -53,8 +55,8 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
             // Restore focus to the triggering Add Concept button when drawer closes
-            if (addConceptButtonRef?.current) {
-                setTimeout(() => addConceptButtonRef.current.focus(), 50);
+            if (triggerButton) {
+                setTimeout(() => triggerButton.focus(), 50);
             }
         };
     }, [isOpen, onClose, addConceptButtonRef]);
@@ -79,8 +81,8 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
                     w-full md:w-85 lg:w-100`}
             >
                 {/* Sticky Header */}
-                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-sardaukar/10 bg-basalt/30 backdrop-blur-md">
-                    <h2 id="drawer-title" className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.25em]">
+                <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-sardaukar/25 bg-basalt/30 backdrop-blur-md">
+                    <h2 id="drawer-title" className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.12em]">
                         Create Concept
                     </h2>
                     <button
