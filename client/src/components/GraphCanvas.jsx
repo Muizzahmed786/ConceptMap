@@ -18,16 +18,21 @@ const getDeterministicPosition = (id) => {
 const GraphCanvas = (props) => {
     const { concepts, connections, onAddConcept, addConceptButtonRef, onConceptSelect, onConnect, onEdgeClick } = props;
 
+    const {beginnerCount, interCount, advanceCount} = useMemo(() => {
+        let beginnerCount = 0, interCount = 0, advanceCount = 0;
+        for(let i=0;i<concepts.length;i++){
+            if(concepts[i].understandingLevel === 'Beginner') beginnerCount++;
+            if(concepts[i].understandingLevel === 'Intermediate') interCount++;
+            if(concepts[i].understandingLevel === 'Advanced') advanceCount++;
+        }
+        return {beginnerCount, interCount, advanceCount};
+    }, [concepts]);
+
     const nodes = useMemo(() => concepts.map((concept) => ({
         id: concept._id,
         position: getDeterministicPosition(concept._id),
         data: { label: concept.title, understanding: concept.understandingLevel },
-        style: concept.understandingLevel === 'Beginner' ? {
-            border: '1px solid rgba(239, 68, 68, 0.8)',
-            boxShadow: '0 0 10px 3px rgba(239, 68, 68, 0.6)',
-            animation: 'glow-pulse 2s ease-in-out infinite',
-            overflow: 'visible',
-        } : {}
+        className: concept.understandingLevel === 'Beginner' ? 'beginner-node' : ''
     })), [concepts]);
 
     const edges = useMemo(() => connections.map((connection) => ({
@@ -58,8 +63,8 @@ const GraphCanvas = (props) => {
     return (
         <div className="bg-linear-to-br from-basalt/15 to-obsidian border border-sardaukar/15 h-full w-full rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.65)] relative overflow-hidden flex flex-col p-6 z-10">
             {nodes.length > 0 ? (
-                <ReactFlow 
-                    nodes={nodes} 
+                <ReactFlow
+                    nodes={nodes}
                     edges={edges}
                     onNodeClick={onNodeClick}
                     onPaneClick={onPaneClick}
@@ -77,6 +82,26 @@ const GraphCanvas = (props) => {
                             <span>[ ADD CONCEPT ]</span>
                         </button>
                     </Panel>
+                    <Panel position='top-left'>
+                        <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/80 backdrop-blur-sm p-3 flex flex-col gap-2">
+                            <span className="text-plasteel/50 tracking-[0.2em] mb-1">[ Knowledge Map ]</span>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
+                                <span className="text-sand">Beginner</span>
+                                <span className="ml-auto text-plasteel font-bold">{beginnerCount}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                                <span className="text-sand">Intermediate</span>
+                                <span className="ml-auto text-plasteel font-bold">{interCount}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                <span className="text-sand">Advanced</span>
+                                <span className="ml-auto text-plasteel font-bold">{advanceCount}</span>
+                            </div>
+                        </div>
+                    </Panel>    
                 </ReactFlow>
             ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10 font-mono-fremen">

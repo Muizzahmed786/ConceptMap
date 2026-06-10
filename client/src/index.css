@@ -138,32 +138,50 @@ body {
 }
 
 /* Custom Nodes style */
-.react-flow__node-default {
-  background: linear-gradient(135deg, #1C1B1A, #121212) !important;
-  border: 1px solid #A8A39D !important;
-  color: #F4F0EA !important;
-  border-radius: 0px !important; /* brutalist sharp corners */
-  padding: 12px 18px !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.12em !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-  max-width: 200px !important;
-  word-wrap: break-word !important;
+.react-flow .react-flow__node-default {
+  background: linear-gradient(135deg, #1C1B1A, #121212);
+  border: 1px solid #A8A39D;
+  color: #F4F0EA;
+  border-radius: 0px; /* brutalist sharp corners */
+  padding: 12px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  max-width: 200px;
+  word-wrap: break-word;
 }
 
-.react-flow__node-default:hover {
-  box-shadow: 0 0 18px rgba(255, 107, 0, 0.3) !important;
-  border-color: #FF6B00 !important;
-  filter: drop-shadow(0 0 3px rgba(255, 107, 0, 0.15)) !important;
+.react-flow .react-flow__node-default:hover {
+  box-shadow: 0 0 18px rgba(255, 107, 0, 0.3);
+  border-color: #FF6B00;
+  filter: drop-shadow(0 0 3px rgba(255, 107, 0, 0.15));
 }
 
-.react-flow__node-default.selected {
-  border: 1px solid #FF6B00 !important;
-  box-shadow: 0 0 22px rgba(255, 107, 0, 0.45) !important;
-  filter: drop-shadow(0 0 5px rgba(255, 107, 0, 0.25)) !important;
+.react-flow .react-flow__node-default.selected {
+  border: 1px solid #FF6B00;
+  box-shadow: 0 0 22px rgba(255, 107, 0, 0.45);
+  filter: drop-shadow(0 0 5px rgba(255, 107, 0, 0.25));
+}
+
+/* Beginner Nodes style */
+.react-flow .react-flow__node-default.beginner-node {
+  border: 1px solid rgba(239, 68, 68, 0.8);
+  animation: glow-pulse 2s ease-in-out infinite;
+  overflow: visible;
+}
+
+.react-flow .react-flow__node-default.beginner-node:hover {
+  border-color: rgba(239, 68, 68, 1);
+}
+
+.react-flow .react-flow__node-default.beginner-node.selected {
+  border: 1px solid #FF6B00;
+  box-shadow: 0 0 22px rgba(255, 107, 0, 0.45);
+  filter: drop-shadow(0 0 5px rgba(255, 107, 0, 0.25));
+  animation: none;
 }
 
 /* Handles styling */
