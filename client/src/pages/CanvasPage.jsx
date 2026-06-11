@@ -20,6 +20,7 @@ const CanvasPage = () => {
     const [isCreatingCanvas, setIsCreatingCanvas] = useState(false);
     const [isSubmittingCanvas, setIsSubmittingCanvas] = useState(false);
     const [newCanvasTitle, setNewCanvasTitle] = useState('');
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
     const addConceptButtonRef = useRef(null);
 
@@ -222,17 +223,56 @@ const CanvasPage = () => {
 
     return (
         <div 
-            className="flex h-screen w-full bg-obsidian text-plasteel overflow-hidden font-body relative"
+            className="flex flex-col md:flex-row h-screen w-full bg-obsidian text-plasteel overflow-hidden font-body relative"
         >
             {/* Film Grain & Vignette overlays */}
             <div className="dune-grain" />
             <div className="dune-vignette" />
 
+            {/* Mobile Top Header (only visible on mobile/tablet) */}
+            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-basalt/60 backdrop-blur-md border-b border-sardaukar/10 shrink-0 z-20">
+                <button
+                    onClick={() => setMobileSidebarOpen(true)}
+                    className="text-[10px] tracking-widest uppercase py-1.5 px-3 border border-sardaukar/20 text-sand hover:text-plasteel transition-all font-mono-fremen cursor-pointer focus:outline-none"
+                >
+                    [ MENU ]
+                </button>
+                <div className="text-xs font-semibold uppercase tracking-[0.12em] font-display text-spice-orange truncate max-w-[60%]">
+                    {canvasList.find((canvas) => canvas._id === currentCanvasId)?.title || "MAP LIST"}
+                </div>
+                {/* Spacer to balance layout */}
+                <div className="w-16"></div>
+            </div>
+
+            {/* Left Sidebar Backdrop Overlay for Mobile */}
+            {mobileSidebarOpen && (
+                <div 
+                    className="md:hidden fixed inset-0 bg-obsidian/60 backdrop-blur-xs z-30 transition-opacity"
+                    onClick={() => setMobileSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
-            <div className="w-1/5 bg-basalt/20 border-r border-sardaukar/10 p-6 flex flex-col h-full overflow-y-auto font-mono-fremen z-10">
-                <h2 className="text-xs font-semibold mb-6 tracking-[0.12em] text-plasteel uppercase font-display border-b border-sardaukar/25 pb-4">
-                    Imperial Maps
-                </h2>
+            <div 
+                className={`fixed inset-y-0 left-0 z-40 w-72 bg-linear-to-b from-basalt/98 to-obsidian border-r border-sardaukar/10 p-6 flex flex-col h-full overflow-y-auto font-mono-fremen transition-transform duration-300
+                    md:static md:w-64 md:translate-x-0 md:bg-basalt/20
+                    ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+            >
+                <div className="flex items-center justify-between border-b border-sardaukar/25 pb-4 mb-6">
+                    <h2 className="text-xs font-semibold tracking-[0.12em] text-plasteel uppercase font-display">
+                        Imperial Maps
+                    </h2>
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={() => setMobileSidebarOpen(false)}
+                        className="md:hidden text-sand hover:text-plasteel p-1.5 border border-transparent hover:border-sardaukar/20 hover:bg-basalt/30 transition-all focus:outline-none rounded-none cursor-pointer"
+                        aria-label="Close menu"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
                 {loading && canvasList.length === 0 ? (
                     <p className="text-xs text-sand animate-pulse font-mono-fremen uppercase tracking-widest">Loading telemetry...</p>
                 ) : (
@@ -249,7 +289,10 @@ const CanvasPage = () => {
                                 >
                                     <button
                                         className="flex-1 text-left p-3.5 cursor-pointer text-xs tracking-wider uppercase font-mono-fremen focus:outline-none"
-                                        onClick={() => setCurrentCanvasId(canvas._id)}
+                                        onClick={() => {
+                                            setCurrentCanvasId(canvas._id);
+                                            setMobileSidebarOpen(false);
+                                        }}
                                     >
                                         {canvas.title}
                                     </button>
@@ -280,7 +323,10 @@ const CanvasPage = () => {
                                     <div className="flex gap-2">
                                         <button
                                             type="button"
-                                            onClick={() => handleCreateCanvas(newCanvasTitle)}
+                                            onClick={() => {
+                                                handleCreateCanvas(newCanvasTitle);
+                                                setMobileSidebarOpen(false);
+                                            }}
                                             disabled={!newCanvasTitle.trim() || isSubmittingCanvas}
                                             className="flex-1 text-xs uppercase tracking-widest py-2 border border-spice-orange/60 text-plasteel hover:bg-spice-orange hover:text-obsidian transition-all font-mono-fremen disabled:opacity-40 cursor-pointer"
                                         >
@@ -315,7 +361,7 @@ const CanvasPage = () => {
             {/* Main Area containing Canvas & Drawer */}
             {
                 canvasList.length > 0 ? (
-                    <div className="flex-1 flex relative h-full overflow-hidden p-6 gap-6 z-10">
+                    <div className="flex-1 flex relative h-full overflow-hidden p-4 sm:p-6 gap-4 sm:gap-6 z-10">
                         <div className="flex-1 min-w-0 h-full transition-all duration-300 ease-in-out">
                             <GraphCanvas
                                 concepts={graphData.concepts}
@@ -337,6 +383,14 @@ const CanvasPage = () => {
                             onSubmit={handleConceptSubmit}
                             addConceptButtonRef={addConceptButtonRef}
                         />
+
+                        {/* Concept Details Sidebar Backdrop Overlay for Mobile/Tablet */}
+                        {currentConcept && (
+                            <div 
+                                className="lg:hidden fixed inset-0 bg-obsidian/60 backdrop-blur-xs z-30 transition-opacity"
+                                onClick={() => setCurrentConcept(null)}
+                            />
+                        )}
 
                         {currentConcept && (
                             <Sidebar 

@@ -37,7 +37,7 @@ const ConnectionForm = (props) => {
     return (
         <div className="fixed inset-0 bg-obsidian/75 backdrop-blur-md flex items-center justify-center z-50 transition-opacity">
             {/* Expanded the max-width to max-w-md for a larger popup */}
-            <div className="bg-linear-to-br from-basalt to-obsidian border border-sardaukar/20 rounded-none p-6 w-full max-w-md shadow-[0_12px_50px_rgba(0,0,0,0.85)] transform transition-all m-4">
+            <div className="bg-linear-to-br from-basalt to-obsidian border border-sardaukar/20 rounded-none p-5 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-[0_12px_50px_rgba(0,0,0,0.85)] transform transition-all m-4">
                 <div className="flex items-center justify-between border-b border-sardaukar/25 pb-3 mb-4">
                     <h2 className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.12em]">
                         [ Connection Telemetry ]
