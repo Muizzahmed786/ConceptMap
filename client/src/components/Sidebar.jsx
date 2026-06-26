@@ -51,21 +51,25 @@ const Sidebar = (props) => {
     if (!currentConcept) return null;
 
     return (
-        <div className="w-85 shrink-0 bg-linear-to-br from-basalt to-obsidian/95 border-l border-sardaukar/20 h-full rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.75)] p-6 flex flex-col relative z-20 backdrop-blur-md">
-            {/* Close Button */}
-            <button
-                onClick={onClose}
-                aria-label="Close details"
-                className="absolute top-6 right-6 text-sand hover:text-plasteel p-1.5 border border-transparent hover:border-sardaukar/25 hover:bg-basalt/30 transition-all focus:outline-none rounded-none cursor-pointer"
-            >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <h2 className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.12em] border-b border-sardaukar/25 pb-4 mb-5">Concept Details</h2>
+        <div className="w-full sm:w-85 shrink-0 bg-linear-to-br from-basalt to-obsidian/95 border-l border-sardaukar/20 h-full rounded-none shadow-[0_12px_40px_rgba(0,0,0,0.75)] flex flex-col fixed top-13.25 right-0 z-40 md:top-0 backdrop-blur-md animate-blast-open lg:relative lg:translate-x-0 lg:z-20">
+            {/* Sticky Header with prominent close cross button */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-sardaukar/25 bg-basalt/30 backdrop-blur-md shrink-0">
+                <h2 className="text-xs font-semibold text-plasteel uppercase font-display tracking-[0.12em]">
+                    Concept Details
+                </h2>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Close details"
+                    className="text-sand hover:text-plasteel p-2 rounded-none hover:bg-basalt/30 transition-all border border-transparent hover:border-sardaukar/20 focus:outline-none cursor-pointer"
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
  
-            <form onSubmit={handleSave} className="flex-1 flex flex-col overflow-hidden">
+            <form onSubmit={handleSave} className="flex-1 flex flex-col overflow-hidden p-6 pt-4">
                 <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-2">
                     <div>
                         <label htmlFor="edit-title" className="block text-[10px] tracking-[0.12em] uppercase font-mono-fremen text-spice-gold mb-1">

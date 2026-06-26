@@ -1,5 +1,5 @@
 import { ReactFlow, Panel, Controls, Background, useNodesState, useEdgesState } from '@xyflow/react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import '@xyflow/react/dist/style.css';
 
 // Pure deterministic coordinate generator to avoid ESLint purity issues
@@ -20,6 +20,7 @@ const GraphCanvas = (props) => {
 
     const [nodes, setNodes, onNodesChange] = useNodesState([]);
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+    const [isLegendExpanded, setIsLegendExpanded] = useState(window.innerWidth >= 768);
 
     const {beginnerCount, interCount, advanceCount} = useMemo(() => {
         let beginnerCount = 0, interCount = 0, advanceCount = 0;
@@ -62,7 +63,7 @@ const GraphCanvas = (props) => {
             })));
         }
         mapNodes();
-    }, [concepts, isolatedNodes]);
+    }, [concepts, setNodes]);
 
     useEffect(() => {
         const mapEdges = () => {
@@ -74,9 +75,9 @@ const GraphCanvas = (props) => {
             })));
         }
         mapEdges();
-    }, [connections]);
+    }, [connections, setEdges]);
 
-    const btnClass = "bg-transparent hover:bg-spice-orange text-plasteel hover:text-obsidian font-mono-fremen text-xs tracking-widest uppercase py-3 px-6 border border-spice-orange/60 hover:border-spice-orange transition-all duration-300 flex items-center space-x-2 rounded-none cursor-pointer dune-shield-hover";
+    const btnClass = "bg-transparent hover:bg-spice-orange text-plasteel hover:text-obsidian font-mono-fremen text-[10px] sm:text-xs tracking-widest uppercase py-2 px-3 sm:py-3 sm:px-6 border border-spice-orange/60 hover:border-spice-orange transition-all duration-300 flex items-center space-x-2 rounded-none cursor-pointer dune-shield-hover";
 
     const onNodeClick = (event, node) => {
         if (onConceptSelect) {
@@ -119,23 +120,36 @@ const GraphCanvas = (props) => {
                         </button>
                     </Panel>
                     <Panel position='top-left'>
-                        <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/80 backdrop-blur-sm p-3 flex flex-col gap-2">
-                            <span className="text-plasteel/50 tracking-[0.2em] mb-1">[ Knowledge Map ]</span>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
-                                <span className="text-sand">Weak</span>
-                                <span className="ml-auto text-plasteel font-bold">{beginnerCount}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
-                                <span className="text-sand">Intermediate</span>
-                                <span className="ml-auto text-plasteel font-bold">{interCount}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                                <span className="text-sand">Advanced</span>
-                                <span className="ml-auto text-plasteel font-bold">{advanceCount}</span>
-                            </div>
+                        <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/85 backdrop-blur-sm p-2.5 sm:p-3 flex flex-col gap-2 transition-all max-w-[200px] select-none">
+                            <button 
+                                onClick={() => setIsLegendExpanded(prev => !prev)}
+                                className="text-plasteel/80 hover:text-plasteel tracking-[0.2em] font-bold text-left flex items-center justify-between gap-2.5 w-full focus:outline-none cursor-pointer"
+                                type="button"
+                            >
+                                <span>[ LEGEND ]</span>
+                                <span className="text-[8px] text-spice-orange font-mono">
+                                    {isLegendExpanded ? "[ ▴ ]" : "[ ▾ ]"}
+                                </span>
+                            </button>
+                            {isLegendExpanded && (
+                                <div className="flex flex-col gap-2 mt-1 border-t border-sardaukar/10 pt-2 transition-all">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
+                                        <span className="text-sand">Weak</span>
+                                        <span className="ml-auto text-plasteel font-bold">{beginnerCount}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                                        <span className="text-sand">Intermediate</span>
+                                        <span className="ml-auto text-plasteel font-bold">{interCount}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                                        <span className="text-sand">Advanced</span>
+                                        <span className="ml-auto text-plasteel font-bold">{advanceCount}</span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </Panel>    
                 </ReactFlow>

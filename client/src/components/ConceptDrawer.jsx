@@ -63,10 +63,18 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
 
     return (
         <>
-            {/* Docking spacer for desktop and tablet layouts to shrink canvas width smoothly */}
+            {/* Backdrop overlay for tablet/mobile */}
+            {isOpen && (
+                <div 
+                    className="lg:hidden fixed inset-0 bg-obsidian/60 backdrop-blur-xs z-35 transition-opacity"
+                    onClick={onClose}
+                />
+            )}
+
+            {/* Docking spacer for desktop layouts to shrink canvas width smoothly */}
             <div 
-                className={`hidden md:block transition-[width] duration-300 ease-in-out shrink-0 ${
-                    isOpen ? "lg:w-100 md:w-85" : "w-0"
+                className={`hidden lg:block transition-[width] duration-300 ease-in-out shrink-0 ${
+                    isOpen ? "lg:w-100" : "w-0"
                 }`}
             />
 
@@ -78,7 +86,7 @@ const ConceptDrawer = ({ isOpen, onClose, onSubmit, addConceptButtonRef }) => {
                 aria-labelledby="drawer-title"
                 className={`absolute top-0 right-0 h-full z-50 bg-gradient-to-b from-basalt to-obsidian/98 border-l border-sardaukar/20 shadow-[0_0_50px_rgba(0,0,0,0.8)] transition-transform duration-500 ease-out flex flex-col
                     ${isOpen ? "translate-x-0" : "translate-x-full"}
-                    w-full md:w-85 lg:w-100`}
+                    w-full sm:w-85 lg:w-100`}
             >
                 {/* Sticky Header */}
                 <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-sardaukar/25 bg-basalt/30 backdrop-blur-md">
