@@ -342,3 +342,9 @@ body {
 .react-flow__controls-button svg {
   fill: currentColor !important;
 }
+
+/*Isolated node styling*/
+.isolated-node {
+  border: 2px dashed #000;
+  opacity: 0.3;
+}

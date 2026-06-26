@@ -31,6 +31,16 @@ const GraphCanvas = (props) => {
         return {beginnerCount, interCount, advanceCount};
     }, [concepts]);
 
+    // to check the isolated nodes, nodes which have the least connections
+    const isolatedNodes = useMemo(() => {
+        const mySet = new Set();
+        connections.forEach((item) => {
+            mySet.add(item.source);
+            mySet.add(item.target);
+        });
+        return concepts.filter((concept) => !mySet.has(concept._id));
+    }, [concepts, connections]);
+
     useEffect(() => {
         const mapNodes = () => {
             setNodes((prevNodes => concepts.map(concept => {
@@ -39,16 +49,20 @@ const GraphCanvas = (props) => {
                 if (concept.understandingLevel === 'Beginner') levelClass = 'beginner-node';
                 else if (concept.understandingLevel === 'Intermediate') levelClass = 'intermediate-node';
                 else if (concept.understandingLevel === 'Advanced') levelClass = 'advanced-node';
+                let classname = levelClass;
+                if(isolatedNodes.some(node => node._id === concept._id)){
+                    classname += ' isolated-node';
+                }
                 return{
                     id: concept._id,
                     position: existing ? existing.position : getDeterministicPosition(concept._id),
                     data: { label: concept.title, understanding: concept.understandingLevel },
-                    className: levelClass,
+                    className: classname,
                 }
             })));
         }
         mapNodes();
-    }, [concepts]);
+    }, [concepts, isolatedNodes]);
 
     useEffect(() => {
         const mapEdges = () => {
