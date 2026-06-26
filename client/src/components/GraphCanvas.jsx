@@ -120,7 +120,7 @@ const GraphCanvas = (props) => {
                         </button>
                     </Panel>
                     <Panel position='top-left'>
-                        <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/85 backdrop-blur-sm p-2.5 sm:p-3 flex flex-col gap-2 transition-all max-w-[200px] select-none">
+                        <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/85 backdrop-blur-sm p-2.5 sm:p-3 flex flex-col gap-2 transition-all max-w-50 select-none">
                             <button 
                                 onClick={() => setIsLegendExpanded(prev => !prev)}
                                 className="text-plasteel/80 hover:text-plasteel tracking-[0.2em] font-bold text-left flex items-center justify-between gap-2.5 w-full focus:outline-none cursor-pointer"
