@@ -6,7 +6,7 @@ import {getConnectionsByConceptId} from "../services/connection.service.js";
 // @route   GET /api/canvases
 // @access  Public
 export const fetchAllCanvases = async (req, res) => {
-    const canvases = await getAllCanvases();
+    const canvases = await getAllCanvases(req.userId);
     if(!canvases){
         return res.status(500).json({message : 'Something went wrong, could not fetch details'});
     }
@@ -22,7 +22,7 @@ export const fetchAllCanvases = async (req, res) => {
 export const fetchCanvasById = async (req, res) => {
     const { id } = req.params;
     try{
-        const canvas = await getCanvasById(id);
+        const canvas = await getCanvasById(id, req.userId);
         if(canvas === false){
             return res.status(404).json({message : `Canvas with id ${id} not found`});
         }
@@ -47,7 +47,7 @@ export const createNewCanvas = async (req, res) => {
         return res.status(400).json({message : `Canvas title cannot be empty`});
     }
     try{
-        const newCanvas = await createCanvas({title: title.trim(), concepts: []});
+        const newCanvas = await createCanvas({title: title.trim(), concepts: []}, req.userId);
         return res.status(201).json(newCanvas);
     } catch(err){
         return res.status(500).json({message : `Something went wrong`});
@@ -70,7 +70,7 @@ export const updateCanvas = async (req, res) => {
     }
 
     try{
-        const canvas = await updatedCanvas(id, {title, concepts});
+        const canvas = await updatedCanvas(id, {title, concepts}, req.userId);
         if(!canvas){
             return res.status(404).json({message : `Canvas with id ${id} not found`});
         }
@@ -89,7 +89,7 @@ export const updateCanvas = async (req, res) => {
 export const deleteCanvasById = async (req, res) => {
     const { id } = req.params;
     try{
-        const deleted = await deleteCanvas(id);
+        const deleted = await deleteCanvas(id, req.userId);
         if(deleted === false){
             return res.status(404).json({message : `Canvas with id ${id} not found`});
         }
@@ -108,7 +108,7 @@ export const deleteCanvasById = async (req, res) => {
 export const getGraphDataForCanvas = async (req, res) => {
     const {canvasId} = req.params;
     try{
-        const canvas = await getCanvasById(canvasId);
+        const canvas = await getCanvasById(canvasId, req.userId);
         if(!canvas){
             return res.status(404).json({message : `Canvas with id ${canvasId} not found`});
         }
