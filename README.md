@@ -2,6 +2,10 @@
 
 ## List of API Endpoints
 ```bash
+Auth:
+POST    /api/auth/register
+POST    /api/auth/login
+
 Canvas:
 GET     /api/canvases
 GET     /api/canvases/:id
