@@ -10,7 +10,12 @@ const canvasSchema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Concept'
         }
-    ]
+    ],
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 }, {
     timestamps: true,
 });

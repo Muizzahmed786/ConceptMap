@@ -10,6 +10,14 @@ const api = axios.create({
     },
 });
 
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if(token){
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 export const fetchCanvases = async () => {
     return api.get('/api/canvases');
 };
@@ -49,5 +57,13 @@ export const updateConnection = async(connectionId, connectionData) => {
 export const deleteConnection = async (connectionId) => {
     return api.delete(`/api/connections/${connectionId}`);
 };
+
+export const registerUser = async (userData) => {
+    return api.post('/api/auth/register', userData);
+}
+
+export const loginUser = async (userData) => {
+    return api.post('/api/auth/login', userData);
+}
 
 export default api;

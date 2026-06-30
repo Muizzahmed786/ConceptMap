@@ -41,6 +41,11 @@
   50% { border-color: #FF6B00; }
 }
 
+@keyframes scan-line {
+  0% { left: -10%; }
+  100% { left: 110%; }
+}
+
 /* Global Overrides */
 body {
   background-color: #121212;

@@ -6,6 +6,8 @@ import connectDB from './config/db.js';
 import canvasRouter from './routes/canvas.routes.js';
 import conceptRouter from './routes/concept.routes.js';
 import connectionRouter from './routes/connection.routes.js';
+import authRouter from './routes/auth.routes.js';
+import { auth } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -22,9 +24,10 @@ app.use(cors({
 const startServer = async () => {
     await connectDB();
 
-    app.use('/api/canvases', canvasRouter);
-    app.use('/api/concepts', conceptRouter);
-    app.use('/api/connections', connectionRouter);
+    app.use('/api/canvases', auth, canvasRouter);
+    app.use('/api/concepts', auth, conceptRouter);
+    app.use('/api/connections', auth, connectionRouter);
+    app.use('/api/auth', authRouter);
 
     app.listen(process.env.PORT, () => console.log(`Server running on ${process.env.PORT}`));
 }
