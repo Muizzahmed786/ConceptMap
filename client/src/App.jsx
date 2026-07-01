@@ -1,8 +1,7 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 
 import CanvasPage from "./pages/CanvasPage.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx"
+import AuthPage from "./pages/AuthPage.jsx";
 import ProtectedRoute from "./pages/ProtectedRoute.jsx";
 
 function App() {
@@ -12,8 +11,8 @@ function App() {
                 <Route path="/" element={<ProtectedRoute>
                                             <CanvasPage />
                                          </ProtectedRoute>} />
-                <Route path="/login" element={<Login />}/>
-                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<AuthPage mode="login" />}/>
+                <Route path="/register" element={<AuthPage mode="register" />} />
             </Routes>
         </BrowserRouter>
     );
