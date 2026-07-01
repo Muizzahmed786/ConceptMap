@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection, createCanvas, deleteCanvas } from "../services/api.js";
 
 import GraphCanvas from "../components/GraphCanvas.jsx";
@@ -7,6 +8,9 @@ import Sidebar from "../components/Sidebar.jsx";
 import ConnectionForm from "../components/ConnectionForm.jsx";
 
 const CanvasPage = () => {
+
+    const navigate = useNavigate();
+
     const [canvasList, setCanvasList] = useState([]);
     const [currentCanvasId, setCurrentCanvasId] = useState(null);
     const [graphData, setGraphData] = useState({ concepts: [], connections: [] });
@@ -26,27 +30,27 @@ const CanvasPage = () => {
 
     // Handle creation of a canvas
     const handleCreateCanvas = async (canvasTitle) => {
-        try{
+        try {
             setIsSubmittingCanvas(true);
             const response = await createCanvas(canvasTitle);
             setCanvasList((prev) => [...prev, response.data]);
             setCurrentCanvasId(response.data._id);
             setNewCanvasTitle('');
             setIsCreatingCanvas(false);
-        } catch(e){
+        } catch (e) {
             console.error(e);
-        } finally{
+        } finally {
             setIsSubmittingCanvas(false);
         }
     }
 
     const handleCanvasDelete = async (canvasId) => {
-        try{
+        try {
             await deleteCanvas(canvasId);
             const remaining = canvasList.filter((canvas) => canvas._id !== canvasId);
             setCanvasList(remaining);
             setCurrentCanvasId(remaining[0]?._id || null);
-        } catch(e){
+        } catch (e) {
             console.error(e);
         }
     }
@@ -97,7 +101,7 @@ const CanvasPage = () => {
                 ...prevData,
                 concepts: [...prevData.concepts, response.data]
             }));
-            
+
             // Trigger toast alert
             setToastVisible(true);
             setToastMessage('Concept created successfully');
@@ -131,7 +135,7 @@ const CanvasPage = () => {
                 concepts: prevData.concepts.map((c) => c._id === conceptId ? response.data : c)
             }));
             setCurrentConcept(response.data);
-            
+
             // Trigger toast alert
             setToastVisible(true);
             setToastMessage('Concept updated successfully');
@@ -145,35 +149,35 @@ const CanvasPage = () => {
 
     // handle deletion of a concept
     const handleConceptDelete = async (conceptId) => {
-        try{
+        try {
             await deleteConcept(conceptId);
             setGraphData((prev) => ({
                 ...prev,
                 concepts: prev.concepts.filter(concept => concept._id !== conceptId),
-                connections: prev.connections.filter(connection => connection.source !== conceptId && connection.target !== conceptId) 
+                connections: prev.connections.filter(connection => connection.source !== conceptId && connection.target !== conceptId)
             }));
             setCurrentConcept(null);
-        } catch(e){
+        } catch (e) {
             console.error(e);
         }
     }
 
     // handleConnect function to manage the creation of connections between concepts
-    const handleConnect = ({source, target}) => {
+    const handleConnect = ({ source, target }) => {
         const pendingConnection = { source: source, target: target, relationType: null };
         setPendingConnection(pendingConnection);
     };
-    
+
     // handle submission of the connection form
     const handleConnectionSubmit = async (connectionData) => {
-        try{
+        try {
             const response = await createConnection(connectionData);
             setGraphData((prev) => ({
                 ...prev,
                 connections: [...prev.connections, response.data]
-            })); 
+            }));
             setPendingConnection(null);
-        } catch(e){
+        } catch (e) {
             console.error(e);
         }
     }
@@ -195,34 +199,42 @@ const CanvasPage = () => {
 
     // handle updating a connection's details
     const handleConnectionUpdate = async (connectionId, updatedData) => {
-        try{
+        try {
             const response = await updateConnection(connectionId, updatedData);
             setGraphData((prev) => ({
                 ...prev,
                 connections: prev.connections.map(connection => connection._id === connectionId ? response.data : connection)
             }));
             setSelectedConnection(null);
-        } catch(e){
+        } catch (e) {
             console.error(e);
         }
     }
 
     // handle deletion of a connection
     const handleConnectionDelete = async (connectionId) => {
-        try{
+        try {
             await deleteConnection(connectionId);
             setGraphData((prev) => ({
                 ...prev,
                 connections: prev.connections.filter(connection => connection._id !== connectionId)
             }));
             setSelectedConnection(null);
-        } catch(e){
+        } catch (e) {
             console.error(e);
         }
     }
 
+    // handle logout
+    const handleLogout = () => {
+        if (window.confirm('Do you want to logout ?')) {
+            localStorage.removeItem('token');
+            navigate('/login');
+        }
+    }
+
     return (
-        <div 
+        <div
             className="flex flex-col md:flex-row h-screen w-full bg-obsidian text-plasteel overflow-hidden font-body relative"
         >
             {/* Film Grain & Vignette overlays */}
@@ -246,14 +258,14 @@ const CanvasPage = () => {
 
             {/* Left Sidebar Backdrop Overlay for Mobile */}
             {mobileSidebarOpen && (
-                <div 
+                <div
                     className="md:hidden fixed inset-0 bg-obsidian/60 backdrop-blur-xs z-30 transition-opacity"
                     onClick={() => setMobileSidebarOpen(false)}
                 />
             )}
 
             {/* Sidebar */}
-            <div 
+            <div
                 className={`fixed inset-y-0 left-0 z-40 w-72 bg-linear-to-b from-basalt/98 to-obsidian border-r border-sardaukar/10 p-6 flex flex-col h-full overflow-y-auto font-mono-fremen transition-transform duration-300
                     md:static md:w-64 md:translate-x-0 md:bg-basalt/20
                     ${mobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
@@ -279,13 +291,12 @@ const CanvasPage = () => {
                     <>
                         <div className="flex flex-col mb-4">
                             {canvasList.map((canvas) => (
-                                <div 
-                                    key={canvas._id} 
-                                    className={`flex items-center justify-between group mb-3 transition-all duration-200 border-l-2 w-full ${
-                                        currentCanvasId === canvas._id
-                                            ? "bg-basalt/50 border-spice-orange text-plasteel font-bold shadow-[inset_0_0_8px_rgba(255,107,0,0.1)]"
-                                            : "bg-transparent border-sardaukar/10 text-sand hover:text-plasteel hover:bg-basalt/25"
-                                    }`}
+                                <div
+                                    key={canvas._id}
+                                    className={`flex items-center justify-between group mb-3 transition-all duration-200 border-l-2 w-full ${currentCanvasId === canvas._id
+                                        ? "bg-basalt/50 border-spice-orange text-plasteel font-bold shadow-[inset_0_0_8px_rgba(255,107,0,0.1)]"
+                                        : "bg-transparent border-sardaukar/10 text-sand hover:text-plasteel hover:bg-basalt/25"
+                                        }`}
                                 >
                                     <button
                                         className="flex-1 text-left p-3.5 cursor-pointer text-xs tracking-wider uppercase font-mono-fremen focus:outline-none"
@@ -307,13 +318,13 @@ const CanvasPage = () => {
                                 </div>
                             ))}
                         </div>
-                        
+
                         {/* Inline text input for new canvas title */}
                         <div>
                             {isCreatingCanvas ? (
                                 <div className="flex flex-col gap-2">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         value={newCanvasTitle}
                                         onChange={(e) => setNewCanvasTitle(e.target.value)}
                                         placeholder="Map designation..."
@@ -356,6 +367,15 @@ const CanvasPage = () => {
                         </div>
                     </>
                 )}
+                <div className="mt-auto pt-6 border-t border-sardaukar/10">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full text-xs uppercase tracking-widest py-2.5 border border-sardaukar/20 text-sand hover:text-red-400 hover:border-red-500/30 hover:bg-red-950/15 transition-all duration-300 font-mono-fremen cursor-pointer"
+                    >
+                        [ LOGOUT ]
+                    </button>
+                </div>
+
             </div>
 
             {/* Main Area containing Canvas & Drawer */}
@@ -386,14 +406,14 @@ const CanvasPage = () => {
 
                         {/* Concept Details Sidebar Backdrop Overlay for Mobile/Tablet */}
                         {currentConcept && (
-                            <div 
+                            <div
                                 className="lg:hidden fixed inset-0 bg-obsidian/60 backdrop-blur-xs z-30 transition-opacity"
                                 onClick={() => setCurrentConcept(null)}
                             />
                         )}
 
                         {currentConcept && (
-                            <Sidebar 
+                            <Sidebar
                                 key={currentConcept._id}
                                 currentConcept={currentConcept}
                                 onSave={handleConceptUpdate}
@@ -420,7 +440,7 @@ const CanvasPage = () => {
             }
 
             {pendingConnection && (
-                <ConnectionForm 
+                <ConnectionForm
                     key={`create-${pendingConnection.source}-${pendingConnection.target}`}
                     pendingConnection={pendingConnection}
                     onSubmit={handleConnectionSubmit}
@@ -431,7 +451,7 @@ const CanvasPage = () => {
             )}
 
             {selectedConnection && (
-                <ConnectionForm 
+                <ConnectionForm
                     key={`edit-${selectedConnection.id}`}
                     pendingConnection={selectedConnection}
                     onSubmit={handleConnectionUpdate}
@@ -446,9 +466,8 @@ const CanvasPage = () => {
             <div
                 role="status"
                 aria-live="polite"
-                className={`fixed bottom-6 right-6 z-50 bg-basalt/95 backdrop-blur-md text-plasteel border border-spice-orange rounded-none px-6 py-4 shadow-[0_0_30px_rgba(255,107,0,0.25)] flex items-center space-x-3 transition-all duration-500 transform font-mono-fremen ${
-                    toastVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
-                }`}
+                className={`fixed bottom-6 right-6 z-50 bg-basalt/95 backdrop-blur-md text-plasteel border border-spice-orange rounded-none px-6 py-4 shadow-[0_0_30px_rgba(255,107,0,0.25)] flex items-center space-x-3 transition-all duration-500 transform font-mono-fremen ${toastVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"
+                    }`}
                 style={{ filter: 'drop-shadow(0 0 8px rgba(255,107,0,0.2))' }}
             >
                 <svg className="w-4 h-4 shrink-0 text-spice-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
