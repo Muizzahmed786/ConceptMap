@@ -133,7 +133,7 @@ const AuthPage = ({ mode = "login" }) => {
         setLoginError('');
         try {
             const response = await loginUser(loginData);
-            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('isAuthenticated', 'true');
             navigate('/');
         } catch (err) {
             setLoginError(err.response?.data?.message || 'Login failed');

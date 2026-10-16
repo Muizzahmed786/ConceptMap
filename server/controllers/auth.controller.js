@@ -1,5 +1,12 @@
 import { registerUser, loginUser } from "../services/auth.service.js";
 
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'nond' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+};
+
 // @desc    User registeration
 // @path    /api/register
 export const register = async (req, res) => {
@@ -23,7 +30,8 @@ export const login = async (req, res) => {
     const userData = {email, password};
     try{
         const response = await loginUser(userData);
-        return res.status(200).json({success: true, token: response});
+        res.cookie('token', response, COOKIE_OPTIONS);
+        return res.status(200).json({success: true, message: 'Logged in successfully'});
     } catch(err){
         if(err.message === 'User not found'){
             return res.status(404).json({success: false, message: err.message});
@@ -35,6 +43,17 @@ export const login = async (req, res) => {
     }
 }
 
+// @desc    User logout
+// @path    /api/auth/logout
 export const logout = async (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    });
 
+    return res.status(200).json({
+        success: true,
+        message: 'Logged out successfully'
+    });
 }

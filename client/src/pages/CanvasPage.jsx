@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection, createCanvas, deleteCanvas } from "../services/api.js";
+import { fetchCanvases, fetchGraphData, createConcept, updateConcept, deleteConcept, createConnection, updateConnection, deleteConnection, createCanvas, deleteCanvas, logoutUser } from "../services/api.js";
 
 import GraphCanvas from "../components/GraphCanvas.jsx";
 import ConceptDrawer from "../components/ConceptDrawer.jsx";
@@ -226,9 +226,14 @@ const CanvasPage = () => {
     }
 
     // handle logout
-    const handleLogout = () => {
+    const handleLogout = async () => {
         if (window.confirm('Do you want to logout ?')) {
-            localStorage.removeItem('token');
+            try {
+                await logoutUser();
+            } catch (e) {
+                console.error('Logout error : ', e);
+            }
+            localStorage.removeItem('isAuthenticated');
             navigate('/login');
         }
     }
