@@ -22,14 +22,14 @@ const GraphCanvas = (props) => {
     const [edges, setEdges, onEdgesChange] = useEdgesState([]);
     const [isLegendExpanded, setIsLegendExpanded] = useState(window.innerWidth >= 768);
 
-    const {beginnerCount, interCount, advanceCount} = useMemo(() => {
+    const { beginnerCount, interCount, advanceCount } = useMemo(() => {
         let beginnerCount = 0, interCount = 0, advanceCount = 0;
-        for(let i=0;i<concepts.length;i++){
-            if(concepts[i].understandingLevel === 'Beginner') beginnerCount++;
-            if(concepts[i].understandingLevel === 'Intermediate') interCount++;
-            if(concepts[i].understandingLevel === 'Advanced') advanceCount++;
+        for (let i = 0; i < concepts.length; i++) {
+            if (concepts[i].understandingLevel === 'Beginner') beginnerCount++;
+            if (concepts[i].understandingLevel === 'Intermediate') interCount++;
+            if (concepts[i].understandingLevel === 'Advanced') advanceCount++;
         }
-        return {beginnerCount, interCount, advanceCount};
+        return { beginnerCount, interCount, advanceCount };
     }, [concepts]);
 
     // to check the isolated nodes, nodes which have the least connections
@@ -51,10 +51,10 @@ const GraphCanvas = (props) => {
                 else if (concept.understandingLevel === 'Intermediate') levelClass = 'intermediate-node';
                 else if (concept.understandingLevel === 'Advanced') levelClass = 'advanced-node';
                 let classname = levelClass;
-                if(isolatedNodes.some(node => node._id === concept._id)){
+                if (isolatedNodes.some(node => node._id === concept._id)) {
                     classname += ' isolated-node';
                 }
-                return{
+                return {
                     id: concept._id,
                     position: existing ? existing.position : getDeterministicPosition(concept._id),
                     data: { label: concept.title, understanding: concept.understandingLevel },
@@ -63,7 +63,7 @@ const GraphCanvas = (props) => {
             })));
         }
         mapNodes();
-    }, [concepts, setNodes]);
+    }, [concepts, setNodes, isolatedNodes]);
 
     useEffect(() => {
         const mapEdges = () => {
@@ -121,7 +121,7 @@ const GraphCanvas = (props) => {
                     </Panel>
                     <Panel position='top-left'>
                         <div className="font-mono-fremen text-[10px] uppercase tracking-widest border border-sardaukar/20 bg-obsidian/85 backdrop-blur-sm p-2.5 sm:p-3 flex flex-col gap-2 transition-all max-w-50 select-none">
-                            <button 
+                            <button
                                 onClick={() => setIsLegendExpanded(prev => !prev)}
                                 className="text-plasteel/80 hover:text-plasteel tracking-[0.2em] font-bold text-left flex items-center justify-between gap-2.5 w-full focus:outline-none cursor-pointer"
                                 type="button"
@@ -151,7 +151,7 @@ const GraphCanvas = (props) => {
                                 </div>
                             )}
                         </div>
-                    </Panel>    
+                    </Panel>
                 </ReactFlow>
             ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-8 z-10 font-mono-fremen">

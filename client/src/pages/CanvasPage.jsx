@@ -88,6 +88,9 @@ const CanvasPage = () => {
                 } finally {
                     setLoading(false);
                 }
+            } else {
+                setGraphData({ concepts: [], connections: [] });
+                setCurrentConcept(null);
             }
         };
         fetchCanvasData();
