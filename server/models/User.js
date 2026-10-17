@@ -20,6 +20,9 @@ const userSchema = mongoose.Schema({
         required: true,
         minlength: 8,
         maxlength: 100
+    }, refreshToken: {
+        type: String,
+        default: null
     }
 },{
     timestamps: true,

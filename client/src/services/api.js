@@ -10,6 +10,37 @@ const api = axios.create({
     },
 });
 
+
+api.interceptors.response.use(
+    (response) => response, // Pass through successful responses untouched
+    async (error) => {
+        const originalRequest = error.config;
+        // If the server returned 401 and we haven't already retried this request
+        if (
+            error.response?.status === 401 && 
+            originalRequest &&
+            !originalRequest._retry &&
+            !originalRequest.url?.includes('/auth/login') &&
+            !originalRequest.url?.includes('/auth/logout') &&
+            !originalRequest.url?.includes('/auth/jwt/refresh')
+        ) {
+            originalRequest._retry = true; // Mark as retried to prevent infinite loops
+            try {
+                // Silently call your refresh route
+                await axios.post(`${BASE_URL}/api/auth/jwt/refresh`, {}, { withCredentials: true });
+                // Re-run the exact original request that failed
+                return api(originalRequest);
+            } catch (refreshError) {
+                // If refresh also fails (session > 7 days old), log out cleanly
+                localStorage.removeItem('isAuthenticated');
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const fetchCanvases = async () => {
     return api.get('/api/canvases');
 };
@@ -50,6 +81,7 @@ export const deleteConnection = async (connectionId) => {
     return api.delete(`/api/connections/${connectionId}`);
 };
 
+// AUTHENTICATION API'S
 export const registerUser = async (userData) => {
     return api.post('/api/auth/register', userData);
 }
